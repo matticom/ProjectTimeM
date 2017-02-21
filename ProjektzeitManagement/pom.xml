@@ -1,0 +1,226 @@
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+  <modelVersion>4.0.0</modelVersion>
+  <groupId>Lernprojekte</groupId> 					<!-- Verzeichnishierachie wo Projekt hingehört "." drückt Ebenen aus, aber nicht zwingend -->
+  <artifactId>ProjektzeitManagement</artifactId> 	<!-- Name des Projekts -->
+  <version>1.0</version> 							<!-- Version des Projekts -->
+  <packaging>jar</packaging> 		<!-- Package bei Builderstellung (falls nicht angegeben autom. jar), auch möglich: pom, maven-plugin, ejb, war, ear, rar, par -->
+  													<!-- "Adresse" des Projekts: groupId:artifactId:(packaging:)(classifier:)version -->
+  													<!-- classifier kann gleiches Artifact (Projekt) mit unterschiedlichen POM unterscheiden (zb jdk1.4 und jdk1.5) -->
+  													
+  <!-- inheritage: für vererbung von POM muss <packaging>pom</packaging> pom enthalten / gleiches Prinzip wie Java -> Object ist superParent mit allg. Attributen -->
+  <!-- dependencyManagement: dependency kann einmal mit Version festgelegt werden, die erbenden Kinder brauchen nur noch Namen keine Version mehr -->
+  <!-- modules: mehrere Projekte in einer Gruppe, die dann alle mit der POM arbeiten -->
+  <!-- properties: -->
+  		<!-- env.X: gibt die shell's enviroment variable zurück, casesensitiv! -->
+  		<!-- <project><version>1.0</version></project> is accessible via ${project.version} -->
+  		<!-- <settings><offline>false</offline></settings> is accessible via ${settings.offline} -->
+  		<!-- All properties accessible via java.lang.System.getProperties() are available as POM properties, such as ${java.home} -->
+		<!-- x: Set within a <properties /> element in the POM. The value of <properties><someVar>value</someVar></properties> may be used as ${someVar} -->
+  		
+  <build>
+  
+<!--   verschiedene Builds: -->
+
+		<!-- "Project Build" contains more elements than just the BaseBuild set -->
+<!--   <build>...</build> -->
+<!--   <profiles> -->
+<!--     <profile> -->
+<!--       "Profile Build" contains a subset of "Project Build"s elements -->
+<!--       <build>...</build> -->
+<!--     </profile> -->
+<!--   </profiles> -->
+
+<!-- BaseBuild -->
+	<!-- defaultGoal: default goal was ausgeführt wenn nichts anderes beim Projektausführen genannt wird-->
+	<!-- directory: std Verzeichnis, wo die Dateien abgelegt werden, std: ${basedir}/target-->
+	<!-- finalName: der Name des finalen Builds wie my-project-1.0.jar, std: ${artifactId}-${version} -->
+	<!-- filter: definiert Name der Dateien die eine Liste von properties besitzen zb <filter>filters/filter1.properties</filter> std: ${basedir}/src/main/filters/-->
+	
+	
+	<!-- resources: sagt wo ressourcen sich befinden / "**" bedeutet beliebiges Verzeichnis-->
+	
+<!-- 	<resources> -->
+<!--       <resource> -->
+<!--         <targetPath>META-INF/plexus</targetPath> -->
+<!--         <filtering>false</filtering> -->
+<!--         <directory>${basedir}/src/main/plexus</directory> -->
+<!--         <includes> -->
+<!--           <include>configuration.xml</include> -->
+<!--         </includes> -->
+<!--         <excludes> -->
+<!--           <exclude>**/*.properties</exclude> -->
+<!--         </excludes> -->
+<!--       </resource> -->
+<!--     </resources> -->
+<!--     <testResources> -->
+<!--       ... -->
+<!--     </testResources> -->
+		
+		<!-- resources: beschreibt welche files und wo sie zu finden sind um in das Projekt integriert zu werden-->
+		<!-- targetPath: true oder false, siehe oben "filter"-->
+		<!-- directory: wo ist die res zu finden std: ${basedir}/src/main/resources-->
+		<!-- includes: datei die im directory eingeschlossen werden sollen / * = wildcard-->
+		<!-- excludes: datei die nicht aus directory eingeschlossen werden sollen, ist stärker als includes-->
+		<!-- testResources: wie resources mit Unterschied, nur zur Testzeit und std: ${basedir}/src/test/resources-->
+		
+	<!-- plugins: -->	
+	
+		<!-- extensions: true oder false, std: false,  siehe unten "extensions" -->
+		<!-- inherited: sollen bei Vererbung einstellungen auf Kind vererbt werden, std: true-->
+		<!-- configuration: konfigurationen die Plugin verlangt werden hier gemacht, muss nicht, vererbung kann hier gestuert werden-->
+		<!-- dependencies: wie normal dependency, nur hier bezogen auf das Plugin-->
+		<!-- executions: jedes Plugin kann verschiedene goals haben und jedes goal in einer anderen Phase-->
+			<!-- id: Self explanatory. It specifies this execution block between all of the others. When the phase is run, it will be shown in the form: [plugin:goal execution: id]. In the case of this example: [antrun:run execution: echodir] -->
+			<!-- goals: Like all pluralized POM elements, this contains a list of singular elements. In this case, a list of plugin goals which are being specified by this execution block. -->
+			<!-- phase: This is the phase that the list of goals will execute in. This is a very powerful option, allowing one to bind any goal to any phase in the build lifecycle, altering the default behavior of Maven. -->
+			<!-- inherited: Like the inherited element above, setting this false will supress Maven from passing this execution onto its children. This element is only meaningful to parent POMs. -->
+			<!-- configuration: Same as above, but confines the configuration to this specific list of goals, rather than all goals under the plugin. -->
+		
+<!-- Build -->	
+	<!-- Directories -->
+	
+
+		<sourceDirectory> src/main/java </sourceDirectory>
+		<testSourceDirectory> src/test/java </testSourceDirectory>
+		<resources>
+			<resource>
+				<directory> src/main/resources </directory>
+			</resource>
+		</resources>
+		<testResources>
+			<testResource>
+				<directory> src/test/resources </directory>
+			</testResource>
+		</testResources>
+		<plugins>
+			<plugin>
+				<artifactId>maven-compiler-plugin</artifactId>
+				<version>3.5.1</version>
+				<configuration>
+					<source>1.8</source>
+					<target>1.8</target>
+				</configuration>
+			</plugin>
+			<plugin>
+				<groupId>org.bsc.maven</groupId>
+				<artifactId>maven-processor-plugin</artifactId>
+				<version>3.2.0</version>
+				<executions>
+					<execution>
+						<id>eclipselink-jpa-metamodel</id>
+						<goals>
+							<goal>process</goal>
+						</goals>
+						<configuration>
+							<compilerArguments>
+								-Aeclipselink.persistencexml=${basedir}/src/main/resources/META-INF/persistence.xml
+							</compilerArguments>
+							<processors>
+								<processor>org.eclipse.persistence.internal.jpa.modelgen.CanonicalModelProcessor
+								</processor>
+							</processors>
+						</configuration>
+					</execution>
+				</executions>
+				<dependencies>
+					<dependency>
+						<groupId>org.eclipse.persistence</groupId>
+						<artifactId>org.eclipse.persistence.jpa.modelgen.processor</artifactId>
+						<version>2.6.4</version>
+						<scope>compile</scope>
+					</dependency>
+				</dependencies>
+			</plugin>
+		</plugins>
+	</build>
+  <dependencies>
+  
+  <!-- "Falls dependency nicht auf Central Maven repository vorhanden: https://maven.apache.org/pom.html unter Dependency -->
+	<!-- type ist der packagetyp wie jar usw -->
+	<!-- scope: (auf welchen Bereich wirkt sich Dependency aus) -->
+		<!-- compile: default, ist in allen classpaths verfügbar, Dependencies werden an abh. Projekte übergeben -->
+		<!-- provided: wie compile, aber man erwartet JDK oder Container, nicht transitiv -->
+		<!-- runtime: nicht nur Compilation verfügbar nur während runtime oder test (classpath) -->
+		<!-- test: nur für Test verfügbar nicht in der normalen Applikation -->
+		<!-- system: ähnlich wie provided aber man muss eine JAR zur verfügung stellen, in der es explizit vorhanden ist-->
+
+	<!-- systemPath: nur bei system wichtig, Pfad muss absolut sein wie ${java.home}/lib -->
+	<!-- optional: sagt anderen Projekten, wenn man dieses Projekt braucht, man braucht die def. Denpendency nicht, damit das Projekt richtig funktioniert -->
+	
+	<!-- Dependency Versionsanforderungen
+	1.0: "Soft" requirement on 1.0 (just a recommendation, if it matches all other ranges for the dependency)
+	[1.0]: "Hard" requirement on 1.0
+	(,1.0]: x <= 1.0
+	[1.2,1.3]: 1.2 <= x <= 1.3
+	[1.0,2.0): 1.0 <= x < 2.0
+	[1.5,): x >= 1.5
+	(,1.0],[1.2,): x <= 1.0 or x >= 1.2; multiple sets are comma-separated
+	(,1.1),(1.1,): this excludes 1.1 (for example if it is known not to work in combination with this library) -->
+	
+	<!-- exclusion: sagt, dass man explizit eine Dependency (die zwingend notwendig ist) einer Dependency nicht haben möchte -> keine Transitivität 
+	wenn man alle nicht möchte: 
+	 <dependency>
+      <groupId>org.apache.maven</groupId>
+      <artifactId>maven-embedder</artifactId>
+      <version>3.1.0</version>
+      <exclusions>
+        <exclusion>
+          <groupId>*</groupId>
+          <artifactId>*</artifactId>
+        </exclusion>
+      </exclusions>
+    </dependency>
+    -->
+		<dependency>
+			<groupId>junit</groupId>
+			<artifactId>junit</artifactId>
+			<version>4.12</version>
+			<scope>test</scope>
+		</dependency>
+		<dependency>
+			<groupId>org.hamcrest</groupId>
+			<artifactId>hamcrest-all</artifactId>
+			<version>1.3</version>
+		</dependency>
+		<dependency>
+			<groupId>org.mockito</groupId>
+			<artifactId>mockito-all</artifactId>
+			<version>2.0.2-beta</version>
+		</dependency>
+		<dependency>
+			<groupId>org.eclipse.persistence</groupId>
+			<artifactId>javax.persistence</artifactId>
+			<version>2.1.1</version>
+		</dependency>
+		<dependency>
+			<groupId>org.eclipse.persistence</groupId>
+			<artifactId>eclipselink</artifactId>
+			<version>2.6.4</version>
+		</dependency>
+		<dependency>
+			<groupId>org.apache.derby</groupId>
+			<artifactId>derby</artifactId>
+			<version>10.12.1.1</version>
+			<scope>test</scope>
+		</dependency>
+		<dependency>
+			<groupId>org.apache.derby</groupId>
+			<artifactId>derbytools</artifactId>
+			<version>10.12.1.1</version>
+			<scope>test</scope>
+		</dependency>
+		<dependency>
+			<groupId>org.dbunit</groupId>
+			<artifactId>dbunit</artifactId>
+			<version>2.5.3</version>
+			<scope>test</scope>
+		</dependency>
+	</dependencies>
+  <repositories>
+		<repository>
+			<id>oss.sonatype.org</id>
+			<name>OSS Sonatype Staging</name>
+			<url>https://oss.sonatype.org/content/groups/staging</url>
+		</repository>
+	</repositories>
+</project>
