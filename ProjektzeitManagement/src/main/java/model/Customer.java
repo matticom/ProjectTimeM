@@ -21,17 +21,15 @@ public class Customer {
 	@Column(name = "Customer_Name")
 	private String name;
 	
-	@OneToMany(targetEntity = Project.class, cascade = CascadeType.ALL)
+	@OneToMany(targetEntity = Project.class, mappedBy = "customer", cascade = CascadeType.ALL)
 	private List<Project> projectList;
 
 	public Customer() {
 		// TODO Auto-generated constructor stub
 	}
 
-	public Customer(int id, String name, List<Project> projectList) {
-		this.id = id;
+	public Customer(String name) {
 		this.name = name;
-		this.projectList = projectList;
 	}
 
 	public int getId() {

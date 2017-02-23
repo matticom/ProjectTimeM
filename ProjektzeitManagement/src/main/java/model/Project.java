@@ -1,6 +1,6 @@
 package model;
 
-import java.time.LocalDate;
+import java.time.Instant;
 import java.util.List;
 
 import javax.persistence.CascadeType;
@@ -10,10 +10,13 @@ import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
+import javax.persistence.JoinTable;
+import javax.persistence.JoinColumn;
 import javax.persistence.ManyToMany;
+import javax.persistence.ManyToOne;
 import javax.persistence.OneToMany;
 
-import dateTimeClassConverters.DateClassConverter;
+import timestampClassConverters.TimestampClassConverter;
 
 @Entity
 public class Project {
@@ -27,24 +30,35 @@ public class Project {
 	private String name;
 	
 	@Column(name = "Project_StartDate")
-	@Convert(converter = DateClassConverter.class)
-	private LocalDate startDate;
+	@Convert(converter = TimestampClassConverter.class)
+	private Instant startDate;
 	
 	@Column(name = "Project_EndDate")
-	@Convert(converter = DateClassConverter.class)
-	private LocalDate endDate;
+	@Convert(converter = TimestampClassConverter.class)
+	private Instant endDate;
 
 	@ManyToMany()
+	@JoinTable(
+			name = "PROJECT_EMPLOYEES",
+			joinColumns = @JoinColumn(name="Project_ID", referencedColumnName="Project_ID"),
+			inverseJoinColumns = @JoinColumn(name="Employee_ID", referencedColumnName="Employee_ID")
+			 )
 	private List<Employee> employeeList;
 	
 	@OneToMany(targetEntity = WorkingTime.class, mappedBy = "project", cascade = CascadeType.ALL)
 	private List<WorkingTime> workingTimeList;
 
+	@JoinColumn(name = "Customer_ID_FK")
+	@ManyToOne()
+	private Customer customer;
+	
+	
+	
 	public Project() {
 		// TODO Auto-generated constructor stub
 	}
-
-	public Project(int id, String name, LocalDate startDate, LocalDate endDate, List<Employee> employeeList, List<WorkingTime> workingTimeList) {
+	
+	public Project(int id, String name, Instant startDate, Instant endDate, List<Employee> employeeList, List<WorkingTime> workingTimeList) {
 		this.id = id;
 		this.name = name;
 		this.startDate = startDate;
@@ -69,19 +83,19 @@ public class Project {
 		this.name = name;
 	}
 
-	public LocalDate getStartDate() {
+	public Instant getStartDate() {
 		return startDate;
 	}
 
-	public void setStartDate(LocalDate startDate) {
+	public void setStartDate(Instant startDate) {
 		this.startDate = startDate;
 	}
 
-	public LocalDate getEndDate() {
+	public Instant getEndDate() {
 		return endDate;
 	}
 
-	public void setEndDate(LocalDate endDate) {
+	public void setEndDate(Instant endDate) {
 		this.endDate = endDate;
 	}
 

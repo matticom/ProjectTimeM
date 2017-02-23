@@ -1,0 +1,13 @@
+----------------------------------------------------------------
+Thu Feb 23 01:05:03 UTC 2017:
+Booting Derby version The Apache Software Foundation - Apache Derby - 10.12.1.1 - (1704137): instance a816c00e-015a-6880-0179-0000048d6208 
+on database directory memory:C:\eclipse\ProjectTimeeM_DB with class loader sun.misc.Launcher$AppClassLoader@6bc7c054 
+Loaded from file:/C:/Users/Matti/.m2/repository/org/apache/derby/derby/10.12.1.1/derby-10.12.1.1.jar
+java.vendor=Oracle Corporation
+java.runtime.version=1.8.0_92-b14
+user.dir=C:\Users\Matti\git\ProjectTimeM\ProjektzeitManagement
+os.name=Windows 10
+os.arch=amd64
+os.version=10.0
+derby.system.home=null
+Database Class Loader started - derby.database.classpath=''

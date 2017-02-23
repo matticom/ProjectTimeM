@@ -8,9 +8,10 @@ import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
+import javax.persistence.JoinColumn;
 import javax.persistence.ManyToOne;
 
-import dateTimeClassConverters.TimeClassConverter;
+import timestampClassConverters.TimestampClassConverter;
 
 @Entity
 public class WorkingTime {
@@ -21,26 +22,28 @@ public class WorkingTime {
 	private int id;
 	
 	@Column(name = "WorkingTime_StartTime")
-	@Convert(converter = TimeClassConverter.class)
+	@Convert(converter = TimestampClassConverter.class)
 	private Instant startTime;
 	
 	@Column(name = "WorkingTime_EndTime")
-	@Convert(converter = TimeClassConverter.class)
+	@Convert(converter = TimestampClassConverter.class)
 	private Instant endTime; 
 	
-	@Column(name = "WorkingTime_BreakTime_ms")
+	@Column(name = "WorkingTime_BreakTime_Seconds")
 	private int breakTime;
 
+	@JoinColumn(name = "Employee_ID_FK")
 	@ManyToOne()
 	private Employee employee;
 	
+	@JoinColumn(name = "Project_ID_FK")
 	@ManyToOne()
 	private Project project;
 	
 	
 	public WorkingTime() {
+		
 	}
-
 
 	public WorkingTime(int id, Instant startTime, Instant endTime, int breakTime, Employee employee, Project project) {
 		this.id = id;
