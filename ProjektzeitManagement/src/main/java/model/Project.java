@@ -30,11 +30,11 @@ public class Project {
 	private String name;
 	
 	@Column(name = "Project_StartDate")
-	@Convert(converter = TimestampClassConverter.class)
+//	@Convert(converter = TimestampClassConverter.class)
 	private Instant startDate;
 	
 	@Column(name = "Project_EndDate")
-	@Convert(converter = TimestampClassConverter.class)
+//	@Convert(converter = TimestampClassConverter.class)
 	private Instant endDate;
 
 	@ManyToMany()
@@ -58,13 +58,10 @@ public class Project {
 		// TODO Auto-generated constructor stub
 	}
 	
-	public Project(int id, String name, Instant startDate, Instant endDate, List<Employee> employeeList, List<WorkingTime> workingTimeList) {
-		this.id = id;
+	public Project(String name, Instant startDate, Instant endDate) {
 		this.name = name;
 		this.startDate = startDate;
 		this.endDate = endDate;
-		this.employeeList = employeeList;
-		this.workingTimeList = workingTimeList;
 	}
 
 	public int getId() {
@@ -113,5 +110,38 @@ public class Project {
 
 	public void setWorkingTimeList(List<WorkingTime> workingTimeList) {
 		this.workingTimeList = workingTimeList;
+	}
+
+	@Override
+	public int hashCode() {
+		final int prime = 31;
+		int result = 1;
+		result = prime * result + id;
+		result = prime * result + ((name == null) ? 0 : name.hashCode());
+		return result;
+	}
+
+	@Override
+	public boolean equals(Object obj) {
+		if (this == obj)
+			return true;
+		if (obj == null)
+			return false;
+		if (getClass() != obj.getClass())
+			return false;
+		Project other = (Project) obj;
+		if (id != other.id)
+			return false;
+		if (name == null) {
+			if (other.name != null)
+				return false;
+		} else if (!name.equals(other.name))
+			return false;
+		return true;
+	}
+
+	@Override
+	public String toString() {
+		return "Project [id=" + id + ", name=" + name + ", startDate=" + startDate + ", endDate=" + endDate + ", customer=" + customer + "]";
 	}
 }

@@ -35,12 +35,9 @@ public class Employee {
 		// TODO Auto-generated constructor stub
 	}
 
-	public Employee(int id, String firstName, String lastName, List<WorkingTime> workingTimeList, List<Project> projectList) {
-		this.id = id;
+	public Employee(String firstName, String lastName) {
 		this.firstName = firstName;
 		this.lastName = lastName;
-		this.workingTimeList = workingTimeList;
-		this.projectList = projectList;
 	}
 
 	public int getId() {
@@ -81,5 +78,44 @@ public class Employee {
 
 	public void setProjectList(List<Project> projectList) {
 		this.projectList = projectList;
+	}
+
+	@Override
+	public int hashCode() {
+		final int prime = 31;
+		int result = 1;
+		result = prime * result + ((firstName == null) ? 0 : firstName.hashCode());
+		result = prime * result + id;
+		result = prime * result + ((lastName == null) ? 0 : lastName.hashCode());
+		return result;
+	}
+
+	@Override
+	public boolean equals(Object obj) {
+		if (this == obj)
+			return true;
+		if (obj == null)
+			return false;
+		if (getClass() != obj.getClass())
+			return false;
+		Employee other = (Employee) obj;
+		if (firstName == null) {
+			if (other.firstName != null)
+				return false;
+		} else if (!firstName.equals(other.firstName))
+			return false;
+		if (id != other.id)
+			return false;
+		if (lastName == null) {
+			if (other.lastName != null)
+				return false;
+		} else if (!lastName.equals(other.lastName))
+			return false;
+		return true;
+	}
+
+	@Override
+	public String toString() {
+		return "Employee [id=" + id + ", firstName=" + firstName + ", lastName=" + lastName + ", workingTimeList=" + workingTimeList + ", projectList=" + projectList + "]";
 	}
 }

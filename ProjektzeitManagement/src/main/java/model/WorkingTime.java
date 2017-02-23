@@ -22,11 +22,11 @@ public class WorkingTime {
 	private int id;
 	
 	@Column(name = "WorkingTime_StartTime")
-	@Convert(converter = TimestampClassConverter.class)
+//	@Convert(converter = TimestampClassConverter.class)
 	private Instant startTime;
 	
 	@Column(name = "WorkingTime_EndTime")
-	@Convert(converter = TimestampClassConverter.class)
+//	@Convert(converter = TimestampClassConverter.class)
 	private Instant endTime; 
 	
 	@Column(name = "WorkingTime_BreakTime_Seconds")
@@ -45,11 +45,8 @@ public class WorkingTime {
 		
 	}
 
-	public WorkingTime(int id, Instant startTime, Instant endTime, int breakTime, Employee employee, Project project) {
-		this.id = id;
+	public WorkingTime(Instant startTime, Employee employee, Project project) {
 		this.startTime = startTime;
-		this.endTime = endTime;
-		this.breakTime = breakTime;
 		this.employee = employee;
 		this.project = project;
 	}
@@ -112,5 +109,38 @@ public class WorkingTime {
 
 	public void setProject(Project project) {
 		this.project = project;
+	}
+
+	@Override
+	public int hashCode() {
+		final int prime = 31;
+		int result = 1;
+		result = prime * result + id;
+		result = prime * result + ((project == null) ? 0 : project.hashCode());
+		return result;
+	}
+
+	@Override
+	public boolean equals(Object obj) {
+		if (this == obj)
+			return true;
+		if (obj == null)
+			return false;
+		if (getClass() != obj.getClass())
+			return false;
+		WorkingTime other = (WorkingTime) obj;
+		if (id != other.id)
+			return false;
+		if (project == null) {
+			if (other.project != null)
+				return false;
+		} else if (!project.equals(other.project))
+			return false;
+		return true;
+	}
+
+	@Override
+	public String toString() {
+		return "WorkingTime [id=" + id + ", startTime=" + startTime + ", endTime=" + endTime + ", breakTime=" + breakTime + ", employee=" + employee + ", project=" + project + "]";
 	}
 }

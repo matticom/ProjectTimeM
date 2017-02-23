@@ -28,11 +28,11 @@ import org.junit.Test;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import model.Customer;
+import model.Employee;
 
-public class CustomerDAOTest {
+public class EmployeeDAOTest {
 	
-	public static final Logger log = LoggerFactory.getLogger("CustomerDAOTest.class");
+	public static final Logger log = LoggerFactory.getLogger("EmployeeDAOTest.class");
 
 	private static IDatabaseConnection mDBUnitConnection;
 	private static IDataSet startDataset;
@@ -41,7 +41,7 @@ public class CustomerDAOTest {
 	private static EntityManager entitymanager;
 	private static Connection connection;
 
-	private CustomerDAO customerDAO;
+	private EmployeeDAO employeeDAO;
 
 	@Before
 	public void setUp() {
@@ -59,7 +59,7 @@ public class CustomerDAOTest {
 			e.printStackTrace();
 		}
 
-		customerDAO = new CustomerDAO(entitymanager);
+		employeeDAO = new EmployeeDAO(entitymanager);
 
 		try {
 			DatabaseOperation.CLEAN_INSERT.execute(mDBUnitConnection, startDataset);
@@ -71,21 +71,21 @@ public class CustomerDAOTest {
 
 	@Test
 	public void testCreateAndSelectByID() {
-		Customer actual = new Customer("Monster INC");
+		Employee actual = new Employee("Pilar", "Catany");
 		entitymanager.getTransaction().begin();
-		int id = customerDAO.create(actual).getId();
+		int id = employeeDAO.create(actual).getId();
 		entitymanager.getTransaction().commit();
 		entitymanager.getTransaction().begin();
-		Customer expected = customerDAO.selectById(id);
+		Employee expected = employeeDAO.selectById(id);
 		entitymanager.getTransaction().commit();
-		assertEquals(expected.getName(), actual.getName());
+		assertEquals(expected.getFirstName(), actual.getFirstName());
 	}
 	
 	@Test(expected = NoResultException.class)
 	public void testNoResultExceptionAtSelectById() {
 		try {
 			entitymanager.getTransaction().begin();
-			customerDAO.selectById(18);
+			employeeDAO.selectById(1);
 			entitymanager.getTransaction().commit();
 		} catch (Exception e) {
 			entitymanager.getTransaction().commit();
@@ -96,50 +96,41 @@ public class CustomerDAOTest {
 	@Test
 	public void testSelectByName() {
 		entitymanager.getTransaction().begin();
-		Customer actual = customerDAO.selectByName("DFB");
+		List<Employee> actual = employeeDAO.selectByName("Tavo", "Siller");
 		entitymanager.getTransaction().commit();
-		assertEquals("DFB", actual.getName());
+		assertEquals("Tavo", actual.get(0).getFirstName());
+		assertEquals("Siller", actual.get(0).getLastName());
+		assertEquals(1, actual.size());
 	}
 	
-	@Test(expected = NoResultException.class)
-	public void testNoResultExceptionAtSelectByName() {
-		try {
-			entitymanager.getTransaction().begin();
-			customerDAO.selectByName("Monster INC");
-			entitymanager.getTransaction().commit();
-		} catch (Exception e) {
-			entitymanager.getTransaction().commit();
-			throw new NoResultException("Exception wurde korrekt gewurfen");
-		}
-	}
-		
 	@Test
-	public void testUpdateCustomer() {
+	public void testUpdateEmployee() {
 		entitymanager.getTransaction().begin();
-		Customer dfb = customerDAO.selectById(1);
+		Employee tavo = employeeDAO.selectById(4);
 		entitymanager.getTransaction().commit();
-		customerDAO.update(dfb, "FIA");
+		employeeDAO.update(tavo, "Hugo", "Sanchez");
 		entitymanager.getTransaction().begin();
-		Customer fia = customerDAO.selectById(1);
+		Employee hugo = employeeDAO.selectById(4);
 		entitymanager.getTransaction().commit();
-		assertEquals("FIA", fia.getName());
+		assertEquals("Hugo", hugo.getFirstName());
+		assertEquals("Sanchez", hugo.getLastName());
 	}
 	
 	@Test(expected = NoResultException.class)
-	public void testCreateAndDeleteCustomer() {
+	public void testCreateAndDeleteEmployee() {
 		
-		Customer monsterInc = new Customer("Monster INC");
+		Employee jonas = new Employee("Jonas", "Kindermann");
 		entitymanager.getTransaction().begin();
-		Customer monsterIncWithId = customerDAO.create(monsterInc);
+		Employee jonasWithId = employeeDAO.create(jonas);
 		entitymanager.getTransaction().commit();
 	
 		entitymanager.getTransaction().begin();
-		customerDAO.delete(monsterIncWithId);
+		employeeDAO.delete(jonasWithId);
 		entitymanager.getTransaction().commit();
 		
 		try {
 			entitymanager.getTransaction().begin();
-			Customer shouldNotExist = customerDAO.selectById(monsterIncWithId.getId());
+			Employee shouldNotExist = employeeDAO.selectById(jonasWithId.getId());
 			entitymanager.getTransaction().commit();
 		} catch (NoResultException e) {
 			entitymanager.getTransaction().commit();
@@ -148,12 +139,13 @@ public class CustomerDAOTest {
 	}
 	
 	@Test
-	public void testSelectAllCustomer() {
+	public void testSelectAllEmployee() {
 		entitymanager.getTransaction().begin();
-		List<Customer> customerList = customerDAO.selectAllCustomer();
+		List<Employee> employeeList = employeeDAO.selectAllEmployee();
 		entitymanager.getTransaction().commit();
-		assertEquals("DFB", customerList.get(0).getName());
-		assertEquals(1, customerList.size());
+		assertEquals("Siller", employeeList.get(0).getLastName());
+		assertEquals("Fournier", employeeList.get(1).getLastName());
+		assertEquals(2, employeeList.size());
 	}
 
 	@After

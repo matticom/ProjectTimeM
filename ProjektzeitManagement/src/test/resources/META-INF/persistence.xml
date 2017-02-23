@@ -10,7 +10,7 @@
 		<provider>org.eclipse.persistence.jpa.PersistenceProvider</provider> <!-- optional, weil default Provider -->
 		
 		<!-- Converters -->
-        <class>timestampClassConverters.TimestampClassConverter</class>
+<!--         <class>timestampClassConverters.TimestampClassConverter</class> -->
         
 		<class>model.Customer</class>
 		<class>model.Employee</class>
