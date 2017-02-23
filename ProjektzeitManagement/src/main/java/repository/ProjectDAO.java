@@ -32,6 +32,7 @@ public class ProjectDAO {
 		return project;
 	}
 	
+	
 //	public List<Project> selectByName(String firstName, String lastName) {
 //		CriteriaBuilder criteriaBuilder = entitymanager.getCriteriaBuilder();
 //		CriteriaQuery<Project> criteriaQuery = criteriaBuilder.createQuery(Project.class);
