@@ -70,6 +70,14 @@ public class CustomerDAOTest {
 	}
 
 	@Test
+	public void testSelectByID() {
+		entitymanager.getTransaction().begin();
+		Customer actual = customerDAO.selectById(1);
+		entitymanager.getTransaction().commit();
+		assertEquals("DFB", actual.getName());
+	}
+	
+	@Test
 	public void testCreateAndSelectByID() {
 		Customer actual = new Customer("Monster INC");
 		entitymanager.getTransaction().begin();
@@ -80,7 +88,7 @@ public class CustomerDAOTest {
 		entitymanager.getTransaction().commit();
 		assertEquals(expected.getName(), actual.getName());
 	}
-	
+		
 	@Test(expected = NoResultException.class)
 	public void testNoResultExceptionAtSelectById() {
 		try {

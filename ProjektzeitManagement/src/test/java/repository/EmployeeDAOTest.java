@@ -70,6 +70,14 @@ public class EmployeeDAOTest {
 	}
 
 	@Test
+	public void testSelectByID() {
+		entitymanager.getTransaction().begin();
+		Employee actual = employeeDAO.selectById(4);
+		entitymanager.getTransaction().commit();
+		assertEquals("Tavo", actual.getFirstName());
+	}
+	
+	@Test
 	public void testCreateAndSelectByID() {
 		Employee actual = new Employee("Pilar", "Catany");
 		entitymanager.getTransaction().begin();

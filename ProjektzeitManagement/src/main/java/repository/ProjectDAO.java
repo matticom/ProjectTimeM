@@ -27,40 +27,36 @@ public class ProjectDAO {
 	public Project selectById(int id) {
 		Project project = entitymanager.find(Project.class, id);
 		if (project == null) {
-			throw new NoResultException("Kein Mitarbeiter mit der ID gefunden");
+			throw new NoResultException("Kein Projekt mit der ID gefunden");
 		}
 		return project;
 	}
 	
+	public Project selectByName(String name) {
+		CriteriaBuilder criteriaBuilder = entitymanager.getCriteriaBuilder();
+		CriteriaQuery<Project> criteriaQuery = criteriaBuilder.createQuery(Project.class);
+
+		Root<Project> project = criteriaQuery.from(Project.class);
+		Predicate whereFilter = criteriaBuilder.like(criteriaBuilder.lower(project.get(Project_.name)), name.toLowerCase());
+		criteriaQuery.select(project).where(whereFilter);
+
+		return entitymanager.createQuery(criteriaQuery).getSingleResult();
+	}
 	
-//	public List<Project> selectByName(String firstName, String lastName) {
-//		CriteriaBuilder criteriaBuilder = entitymanager.getCriteriaBuilder();
-//		CriteriaQuery<Project> criteriaQuery = criteriaBuilder.createQuery(Project.class);
-//
-//		Root<Project> project = criteriaQuery.from(Project.class);
-//		Predicate selectFirstName = criteriaBuilder.like(criteriaBuilder.lower(project.get(Project_.firstName)), firstName.toLowerCase());
-//		Predicate selectLastName = criteriaBuilder.like(criteriaBuilder.lower(project.get(Project_.lastName)), lastName.toLowerCase());
-//		Predicate whereFilter = criteriaBuilder.and(selectFirstName, selectLastName);
-//		criteriaQuery.select(project).where(whereFilter);
-//
-//		return entitymanager.createQuery(criteriaQuery).getResultList();
-//	}
-//	
-//	public List<Project> selectAllProject() {
-//		CriteriaBuilder criteriaBuilder = entitymanager.getCriteriaBuilder();
-//		CriteriaQuery<Project> criteriaQuery = criteriaBuilder.createQuery(Project.class);
-//
-//		Root<Project> project = criteriaQuery.from(Project.class);
-//		criteriaQuery.select(project);
-//		
-//		return entitymanager.createQuery(criteriaQuery).getResultList();
-//	}
-//		
-//	public Project update(Project project, String newFirstName, String newLastName) {
-//		project.setFirstName(newFirstName);
-//		project.setLastName(newLastName);
-//		return project;
-//	}
+	public List<Project> selectAllProject() {
+		CriteriaBuilder criteriaBuilder = entitymanager.getCriteriaBuilder();
+		CriteriaQuery<Project> criteriaQuery = criteriaBuilder.createQuery(Project.class);
+
+		Root<Project> project = criteriaQuery.from(Project.class);
+		criteriaQuery.select(project);
+		
+		return entitymanager.createQuery(criteriaQuery).getResultList();
+	}
+		
+	public Project update(Project project, String newName) {
+		project.setName(newName);
+		return project;
+	}
 	
 	public void delete(Project project) {
 		entitymanager.remove(project);
