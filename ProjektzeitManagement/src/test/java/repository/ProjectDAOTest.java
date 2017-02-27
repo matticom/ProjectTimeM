@@ -33,8 +33,9 @@ import org.junit.Test;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import model.Customer;
 import model.Project;
+
+import static timestampClassConverters.TimeConvertErsatz.*;
 
 public class ProjectDAOTest {
 	
@@ -48,8 +49,8 @@ public class ProjectDAOTest {
 	private static Connection connection;
 
 	private ProjectDAO projectDAO;
-	private Instant startDate;
-	private Instant endDate;
+	private long startDate;
+	private long endDate;
 
 	@Before
 	public void setUp() {
@@ -68,8 +69,8 @@ public class ProjectDAOTest {
 		}
 
 		projectDAO = new ProjectDAO(entitymanager);
-		startDate = LocalDateTime.of(2017, Month.APRIL, 1, 12, 0).toInstant(ZoneOffset.UTC);
-		endDate = LocalDateTime.of(2018, Month.APRIL, 1, 12, 0).toInstant(ZoneOffset.UTC);
+		startDate = instantToLong(LocalDateTime.of(2017, Month.APRIL, 1, 12, 0).toInstant(ZoneOffset.UTC));
+		endDate = instantToLong(LocalDateTime.of(2018, Month.APRIL, 1, 12, 0).toInstant(ZoneOffset.UTC));
 
 		try {
 			DatabaseOperation.CLEAN_INSERT.execute(mDBUnitConnection, startDataset);
@@ -78,9 +79,17 @@ public class ProjectDAOTest {
 			e.printStackTrace();
 		}
 	}
+	
+	@Test
+	public void testSelectByID() {
+		entitymanager.getTransaction().begin();
+		Project actual = projectDAO.selectById(2);
+		entitymanager.getTransaction().commit();
+		assertEquals("DFB Webseite", actual.getName());
+	}
 
 	@Test
-	public void testCreateAndSelectByID() { //////////////// hierrrrrrrrrrrrrrrrrr!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+	public void testCreateAndSelectByID() {
 		Project actual = new Project("Projektmanagement", startDate, endDate);
 		
 		entitymanager.getTransaction().begin();
@@ -97,16 +106,6 @@ public class ProjectDAOTest {
 		assertEquals(endDate, actual.getEndDate());
 	}
 	
-	@Test
-	public void testSelectByID() {
-		
-		entitymanager.getTransaction().begin();
-		Project actual = projectDAO.selectById(2);
-		entitymanager.getTransaction().commit();
-		assertEquals("DFB Webseite", actual.getName());
-		
-	}
-	
 	@Test(expected = NoResultException.class)
 	public void testNoResultExceptionAtSelectById() {
 		try {
@@ -118,69 +117,71 @@ public class ProjectDAOTest {
 			throw new NoResultException("Exception wurde korrekt gewurfen");
 		}
 	}
-//	
-//	@Test
-//	public void testSelectByName() {
-//		entitymanager.getTransaction().begin();
-//		Project actual = projectDAO.selectByName("DFB");
-//		entitymanager.getTransaction().commit();
-//		assertEquals("DFB", actual.getName());
-//	}
-//	
-//	@Test(expected = NoResultException.class)
-//	public void testNoResultExceptionAtSelectByName() {
-//		try {
-//			entitymanager.getTransaction().begin();
-//			projectDAO.selectByName("Monster INC");
-//			entitymanager.getTransaction().commit();
-//		} catch (Exception e) {
-//			entitymanager.getTransaction().commit();
-//			throw new NoResultException("Exception wurde korrekt gewurfen");
-//		}
-//	}
-//		
-//	@Test
-//	public void testUpdateProject() {
-//		entitymanager.getTransaction().begin();
-//		Project dfb = projectDAO.selectById(1);
-//		entitymanager.getTransaction().commit();
-//		projectDAO.update(dfb, "FIA");
-//		entitymanager.getTransaction().begin();
-//		Project fia = projectDAO.selectById(1);
-//		entitymanager.getTransaction().commit();
-//		assertEquals("FIA", fia.getName());
-//	}
-//	
-//	@Test(expected = NoResultException.class)
-//	public void testCreateAndDeleteProject() {
-//		
-//		Project monsterInc = new Project("Monster INC");
-//		entitymanager.getTransaction().begin();
-//		Project monsterIncWithId = projectDAO.create(monsterInc);
-//		entitymanager.getTransaction().commit();
-//	
-//		entitymanager.getTransaction().begin();
-//		projectDAO.delete(monsterIncWithId);
-//		entitymanager.getTransaction().commit();
-//		
-//		try {
-//			entitymanager.getTransaction().begin();
-//			Project shouldNotExist = projectDAO.selectById(monsterIncWithId.getId());
-//			entitymanager.getTransaction().commit();
-//		} catch (NoResultException e) {
-//			entitymanager.getTransaction().commit();
-//			throw new NoResultException("Exception wurde korrekt gewurfen");
-//		}
-//	}
-//	
-//	@Test
-//	public void testSelectAllProject() {
-//		entitymanager.getTransaction().begin();
-//		List<Project> projectList = projectDAO.selectAllProject();
-//		entitymanager.getTransaction().commit();
-//		assertEquals("DFB", projectList.get(0).getName());
-//		assertEquals(1, projectList.size());
-//	}
+	
+	@Test
+	public void testSelectByName() {
+		entitymanager.getTransaction().begin();
+		Project actual = projectDAO.selectByName("DFB Webseite");
+		entitymanager.getTransaction().commit();
+		assertEquals("DFB Webseite", actual.getName());
+	}
+	
+	@Test(expected = NoResultException.class)
+	public void testNoResultExceptionAtSelectByName() {
+		try {
+			entitymanager.getTransaction().begin();
+			projectDAO.selectByName("Monster INC");
+			entitymanager.getTransaction().commit();
+		} catch (Exception e) {
+			entitymanager.getTransaction().commit();
+			throw new NoResultException("Exception wurde korrekt gewurfen");
+		}
+	}
+		
+	@Test
+	public void testUpdateProject() {
+		entitymanager.getTransaction().begin();
+		Project dfbWeb = projectDAO.selectById(2);
+		entitymanager.getTransaction().commit();
+		Project expectedProjectTM = new Project("ProjectTM", startDate, endDate);
+		projectDAO.update(dfbWeb, expectedProjectTM);
+		entitymanager.getTransaction().begin();
+		Project actualProjectTM = projectDAO.selectById(2);
+		entitymanager.getTransaction().commit();
+		assertEquals(expectedProjectTM.getName(), actualProjectTM.getName());
+	}
+	
+	@Test(expected = NoResultException.class)
+	public void testCreateAndDeleteProject() {
+		
+		Project monsterProject = new Project("Monster Project", startDate, endDate);
+		entitymanager.getTransaction().begin();
+		Project monsterProjectWithId = projectDAO.create(monsterProject);
+		entitymanager.getTransaction().commit();
+	
+		entitymanager.getTransaction().begin();
+		projectDAO.delete(monsterProjectWithId);
+		entitymanager.getTransaction().commit();
+		
+		try {
+			entitymanager.getTransaction().begin();
+			Project shouldNotExist = projectDAO.selectById(monsterProjectWithId.getId());
+			entitymanager.getTransaction().commit();
+		} catch (NoResultException e) {
+			entitymanager.getTransaction().commit();
+			throw new NoResultException("Exception wurde korrekt gewurfen");
+		}
+	}
+	
+	@Test
+	public void testSelectAllProject() {
+		entitymanager.getTransaction().begin();
+		List<Project> projectList = projectDAO.selectAllProjects();
+		entitymanager.getTransaction().commit();
+		assertEquals("DFB Webseite", projectList.get(0).getName());
+		assertEquals("DFB E-Commerce", projectList.get(1).getName());
+		assertEquals(2, projectList.size());
+	}
 
 	@After
 	public void tearDown() {

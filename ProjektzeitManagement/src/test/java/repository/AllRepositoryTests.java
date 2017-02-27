@@ -9,7 +9,9 @@ import repository.CustomerDAOTest;
 @RunWith(Suite.class)
 @SuiteClasses({ 
 	CustomerDAOTest.class,
-	EmployeeDAOTest.class
+	EmployeeDAOTest.class,
+	ProjectDAOTest.class,
+	WorkingTimeDAOTest.class
 })
 
 public class AllRepositoryTests {

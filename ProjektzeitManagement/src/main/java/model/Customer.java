@@ -21,7 +21,7 @@ public class Customer {
 	@Column(name = "Customer_Name")
 	private String name;
 	
-	@OneToMany(targetEntity = Project.class, mappedBy = "customer", cascade = CascadeType.ALL)
+	@OneToMany(targetEntity = Project.class, mappedBy = "customer")//, cascade = CascadeType.ALL)
 	private List<Project> projectList;
 
 	public Customer() {

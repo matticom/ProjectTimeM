@@ -25,10 +25,10 @@ public class Employee {
 	@Column(name = "Employee_LastName")
 	private String lastName;
 	
-	@OneToMany(targetEntity = WorkingTime.class, mappedBy = "employee", cascade = CascadeType.ALL)
+	@OneToMany(targetEntity = WorkingTime.class, mappedBy = "employee")//, cascade = CascadeType.ALL)
 	private List<WorkingTime> workingTimeList;
 	
-	@ManyToMany(targetEntity = Project.class, mappedBy = "employeeList", cascade = CascadeType.ALL)
+	@ManyToMany(targetEntity = Project.class, mappedBy = "employeeList")//, cascade = CascadeType.ALL)
 	private List<Project> projectList;
 
 	public Employee() {

@@ -6,6 +6,11 @@ import java.io.File;
 import java.io.FileOutputStream;
 import java.sql.Connection;
 import java.sql.SQLException;
+import java.time.Instant;
+import java.time.LocalDateTime;
+import java.time.Month;
+import java.time.ZoneId;
+import java.time.ZoneOffset;
 import java.util.List;
 
 import javax.persistence.EntityManager;
@@ -28,11 +33,15 @@ import org.junit.Test;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import model.Customer;
+import model.Employee;
+import model.Project;
+import model.WorkingTime;
 
-public class CustomerDAOTest {
+import static timestampClassConverters.TimeConvertErsatz.*;
+
+public class WorkingTimeDAOTest {
 	
-	public static final Logger log = LoggerFactory.getLogger("CustomerDAOTest.class");
+	public static final Logger log = LoggerFactory.getLogger("WorkingTimeDAOTest.class");
 
 	private static IDatabaseConnection mDBUnitConnection;
 	private static IDataSet startDataset;
@@ -41,7 +50,13 @@ public class CustomerDAOTest {
 	private static EntityManager entitymanager;
 	private static Connection connection;
 
-	private CustomerDAO customerDAO;
+	private WorkingTimeDAO workingTimeDAO;
+	private EmployeeDAO employeeDAO;
+	private ProjectDAO projectDAO;
+	private long startDate;
+	private long endDate;
+	private Project dFBWeb;
+	private Employee tavo;
 
 	@Before
 	public void setUp() {
@@ -59,7 +74,16 @@ public class CustomerDAOTest {
 			e.printStackTrace();
 		}
 
-		customerDAO = new CustomerDAO(entitymanager);
+		workingTimeDAO = new WorkingTimeDAO(entitymanager);
+		employeeDAO = new EmployeeDAO(entitymanager);
+		projectDAO = new ProjectDAO(entitymanager);
+		startDate = instantToLong(LocalDateTime.of(2017, Month.APRIL, 1, 12, 0).toInstant(ZoneOffset.UTC));
+		endDate = instantToLong(LocalDateTime.of(2018, Month.APRIL, 1, 12, 0).toInstant(ZoneOffset.UTC));
+				
+//		<WORKINGTIME WORKINGTIME_ID="6" WORKINGTIME_BREAKTIME_SECONDS="2700" WORKINGTIME_ENDTIME="1518281100" WORKINGTIME_STARTTIME="1518249600" EMPLOYEE_ID_FK="4" PROJECT_ID_FK="2"/>
+//		<WORKINGTIME WORKINGTIME_ID="7" WORKINGTIME_BREAKTIME_SECONDS="2700" WORKINGTIME_ENDTIME="1518361100" WORKINGTIME_STARTTIME="1518329600" EMPLOYEE_ID_FK="5" PROJECT_ID_FK="2"/>
+//		<WORKINGTIME WORKINGTIME_ID="8" WORKINGTIME_BREAKTIME_SECONDS="2700" WORKINGTIME_ENDTIME="1518441100" WORKINGTIME_STARTTIME="1518409600" EMPLOYEE_ID_FK="4" PROJECT_ID_FK="3"/>
+//		<WORKINGTIME WORKINGTIME_ID="9" WORKINGTIME_BREAKTIME_SECONDS="2700" WORKINGTIME_ENDTIME="1518531100" WORKINGTIME_STARTTIME="1518499600" EMPLOYEE_ID_FK="5" PROJECT_ID_FK="3"/>
 
 		try {
 			DatabaseOperation.CLEAN_INSERT.execute(mDBUnitConnection, startDataset);
@@ -67,33 +91,42 @@ public class CustomerDAOTest {
 			log.error("Exception bei DBUnit/DatabaseOperation: " + e.getMessage());
 			e.printStackTrace();
 		}
-	}
-
-	@Test
-	public void testSelectByID() {
+		
 		entitymanager.getTransaction().begin();
-		Customer actual = customerDAO.selectById(1);
+		tavo = employeeDAO.selectById(4);
 		entitymanager.getTransaction().commit();
-		assertEquals("DFB", actual.getName());
+		entitymanager.getTransaction().begin();
+		dFBWeb = projectDAO.selectById(2);
+		entitymanager.getTransaction().commit();
 	}
 	
 	@Test
-	public void testCreateAndSelectByID() {
-		Customer actual = new Customer("Monster INC");
+	public void testSelectByID() {
 		entitymanager.getTransaction().begin();
-		int id = customerDAO.create(actual).getId();
+		WorkingTime actual = workingTimeDAO.selectById(6);
 		entitymanager.getTransaction().commit();
-		entitymanager.getTransaction().begin();
-		Customer expected = customerDAO.selectById(id);
-		entitymanager.getTransaction().commit();
-		assertEquals(expected.getName(), actual.getName());
+		assertEquals(1518249600, actual.getStartTime());
 	}
-		
+
+	@Test
+	public void testCreateAndSelectByID() {
+		WorkingTime expected = new WorkingTime(1518600000, tavo, dFBWeb);
+		entitymanager.getTransaction().begin();
+		int id = workingTimeDAO.create(expected).getId();
+		entitymanager.getTransaction().commit();
+		entitymanager.getTransaction().begin();
+		WorkingTime actual = workingTimeDAO.selectById(id);
+		entitymanager.getTransaction().commit();
+		assertEquals(1518600000, actual.getStartTime());
+		assertEquals(tavo, actual.getEmployee());
+		assertEquals(dFBWeb, actual.getProject());
+	}
+	
 	@Test(expected = NoResultException.class)
 	public void testNoResultExceptionAtSelectById() {
 		try {
 			entitymanager.getTransaction().begin();
-			customerDAO.selectById(18);
+			workingTimeDAO.selectById(1343);
 			entitymanager.getTransaction().commit();
 		} catch (Exception e) {
 			entitymanager.getTransaction().commit();
@@ -102,53 +135,42 @@ public class CustomerDAOTest {
 	}
 	
 	@Test
-	public void testSelectByName() {
+	public void testSelectStartTimeBetween() {
 		entitymanager.getTransaction().begin();
-		Customer actual = customerDAO.selectByName("DFB");
+		List<WorkingTime> actualWTList = workingTimeDAO.selectStartTimeBetween(1518249599, 1518249700, dFBWeb, tavo);
 		entitymanager.getTransaction().commit();
-		assertEquals("DFB", actual.getName());
+		assertEquals(1518249600, actualWTList.get(0).getStartTime());
 	}
-	
-	@Test(expected = NoResultException.class)
-	public void testNoResultExceptionAtSelectByName() {
-		try {
-			entitymanager.getTransaction().begin();
-			customerDAO.selectByName("Monster INC");
-			entitymanager.getTransaction().commit();
-		} catch (Exception e) {
-			entitymanager.getTransaction().commit();
-			throw new NoResultException("Exception wurde korrekt gewurfen");
-		}
-	}
+
 		
 	@Test
-	public void testUpdateCustomer() {
+	public void testUpdateWorkingTime() {
 		entitymanager.getTransaction().begin();
-		Customer dfb = customerDAO.selectById(1);
+		WorkingTime dfbEComGuil = workingTimeDAO.selectById(9);
 		entitymanager.getTransaction().commit();
-		Customer expectedFia = new Customer("FIA");
-		customerDAO.update(dfb, expectedFia);
+		WorkingTime expectedDfbWebTavo = new WorkingTime(1518600000, tavo, dFBWeb);
+		workingTimeDAO.update(dfbEComGuil, expectedDfbWebTavo);
 		entitymanager.getTransaction().begin();
-		Customer actualFia = customerDAO.selectById(1);
+		WorkingTime actualDfbWebTavo = workingTimeDAO.selectById(9);
 		entitymanager.getTransaction().commit();
-		assertEquals(expectedFia.getName(), actualFia.getName());
+		assertEquals(1518600000, actualDfbWebTavo.getStartTime());
 	}
 	
 	@Test(expected = NoResultException.class)
-	public void testCreateAndDeleteCustomer() {
+	public void testCreateAndDeleteWorkingTime() {
 		
-		Customer monsterInc = new Customer("Monster INC");
+		WorkingTime dfbWebTavo = new WorkingTime(1518600000, tavo, dFBWeb);
 		entitymanager.getTransaction().begin();
-		Customer monsterIncWithId = customerDAO.create(monsterInc);
+		WorkingTime dfbWebTavoWithId = workingTimeDAO.create(dfbWebTavo);
 		entitymanager.getTransaction().commit();
 	
 		entitymanager.getTransaction().begin();
-		customerDAO.delete(monsterIncWithId);
+		workingTimeDAO.delete(dfbWebTavoWithId);
 		entitymanager.getTransaction().commit();
 		
 		try {
 			entitymanager.getTransaction().begin();
-			Customer shouldNotExist = customerDAO.selectById(monsterIncWithId.getId());
+			WorkingTime shouldNotExist = workingTimeDAO.selectById(dfbWebTavoWithId.getId());
 			entitymanager.getTransaction().commit();
 		} catch (NoResultException e) {
 			entitymanager.getTransaction().commit();
@@ -157,12 +179,12 @@ public class CustomerDAOTest {
 	}
 	
 	@Test
-	public void testSelectAllCustomer() {
+	public void testSelectAllWorkingTimes() {
 		entitymanager.getTransaction().begin();
-		List<Customer> customerList = customerDAO.selectAllCustomers();
+		List<WorkingTime> workingTimeList = workingTimeDAO.selectAllWorkingTimes(dFBWeb, tavo);
 		entitymanager.getTransaction().commit();
-		assertEquals("DFB", customerList.get(0).getName());
-		assertEquals(1, customerList.size());
+		assertEquals(1518249600, workingTimeList.get(0).getStartTime());
+		assertEquals(1, workingTimeList.size());
 	}
 
 	@After

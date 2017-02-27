@@ -13,6 +13,7 @@ import javax.persistence.ManyToOne;
 
 import timestampClassConverters.TimestampClassConverter;
 
+
 @Entity
 public class WorkingTime {
 
@@ -23,11 +24,11 @@ public class WorkingTime {
 	
 	@Column(name = "WorkingTime_StartTime")
 //	@Convert(converter = TimestampClassConverter.class)
-	private Instant startTime;
+	private long startTime;
 	
 	@Column(name = "WorkingTime_EndTime")
 //	@Convert(converter = TimestampClassConverter.class)
-	private Instant endTime; 
+	private long endTime; 
 	
 	@Column(name = "WorkingTime_BreakTime_Seconds")
 	private int breakTime;
@@ -45,7 +46,7 @@ public class WorkingTime {
 		
 	}
 
-	public WorkingTime(Instant startTime, Employee employee, Project project) {
+	public WorkingTime(long startTime, Employee employee, Project project) {
 		this.startTime = startTime;
 		this.employee = employee;
 		this.project = project;
@@ -62,22 +63,22 @@ public class WorkingTime {
 	}
 
 
-	public Instant getStartTime() {
+	public long getStartTime() {
 		return startTime;
 	}
 
 
-	public void setStartTime(Instant startTime) {
+	public void setStartTime(long startTime) {
 		this.startTime = startTime;
 	}
 
 
-	public Instant getEndTime() {
+	public long getEndTime() {
 		return endTime;
 	}
 
 
-	public void setEndTime(Instant endTime) {
+	public void setEndTime(long endTime) {
 		this.endTime = endTime;
 	}
 

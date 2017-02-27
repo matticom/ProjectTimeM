@@ -116,12 +116,13 @@ public class EmployeeDAOTest {
 		entitymanager.getTransaction().begin();
 		Employee tavo = employeeDAO.selectById(4);
 		entitymanager.getTransaction().commit();
-		employeeDAO.update(tavo, "Hugo", "Sanchez");
+		Employee expectedHugo = new Employee("Hugo", "Sanchez");
+		employeeDAO.update(tavo, expectedHugo);
 		entitymanager.getTransaction().begin();
-		Employee hugo = employeeDAO.selectById(4);
+		Employee actualHugo = employeeDAO.selectById(4);
 		entitymanager.getTransaction().commit();
-		assertEquals("Hugo", hugo.getFirstName());
-		assertEquals("Sanchez", hugo.getLastName());
+		assertEquals(expectedHugo.getFirstName(), actualHugo.getFirstName());
+		assertEquals(expectedHugo.getLastName(), actualHugo.getLastName());
 	}
 	
 	@Test(expected = NoResultException.class)
@@ -149,7 +150,7 @@ public class EmployeeDAOTest {
 	@Test
 	public void testSelectAllEmployee() {
 		entitymanager.getTransaction().begin();
-		List<Employee> employeeList = employeeDAO.selectAllEmployee();
+		List<Employee> employeeList = employeeDAO.selectAllEmployees();
 		entitymanager.getTransaction().commit();
 		assertEquals("Siller", employeeList.get(0).getLastName());
 		assertEquals("Fournier", employeeList.get(1).getLastName());

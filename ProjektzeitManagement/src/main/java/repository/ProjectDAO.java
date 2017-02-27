@@ -12,7 +12,7 @@ import javax.persistence.criteria.Root;
 import model.Project;
 import model.Project_;
 
-public class ProjectDAO {
+public class ProjectDAO implements IProjectDAO{
 	private EntityManager entitymanager;
 
 	public ProjectDAO(EntityManager entitymanager) {
@@ -23,7 +23,7 @@ public class ProjectDAO {
 		entitymanager.persist(project);
 		return project;
 	}
-	
+
 	public Project selectById(int id) {
 		Project project = entitymanager.find(Project.class, id);
 		if (project == null) {
@@ -31,7 +31,7 @@ public class ProjectDAO {
 		}
 		return project;
 	}
-	
+
 	public Project selectByName(String name) {
 		CriteriaBuilder criteriaBuilder = entitymanager.getCriteriaBuilder();
 		CriteriaQuery<Project> criteriaQuery = criteriaBuilder.createQuery(Project.class);
@@ -42,22 +42,30 @@ public class ProjectDAO {
 
 		return entitymanager.createQuery(criteriaQuery).getSingleResult();
 	}
-	
-	public List<Project> selectAllProject() {
+
+	public List<Project> selectAllProjects() {
 		CriteriaBuilder criteriaBuilder = entitymanager.getCriteriaBuilder();
 		CriteriaQuery<Project> criteriaQuery = criteriaBuilder.createQuery(Project.class);
 
 		Root<Project> project = criteriaQuery.from(Project.class);
 		criteriaQuery.select(project);
-		
+
 		return entitymanager.createQuery(criteriaQuery).getResultList();
 	}
-		
-	public Project update(Project project, String newName) {
-		project.setName(newName);
+
+	public Project update(Project project, Project newProject) {
+		project.setName(newProject.getName());
+		project.setStartDate(newProject.getStartDate());
+		project.setEndDate(newProject.getEndDate());
+		if (newProject.getEmployeeList() != null) {
+			project.setEmployeeList(newProject.getEmployeeList());
+		}
+		if (newProject.getWorkingTimeList() != null) {
+			project.setWorkingTimeList(newProject.getWorkingTimeList());
+		}
 		return project;
 	}
-	
+
 	public void delete(Project project) {
 		entitymanager.remove(project);
 	}

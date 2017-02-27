@@ -23,7 +23,7 @@ public class EmployeeDAO implements IEmployeeDAO {
 		entitymanager.persist(employee);
 		return employee;
 	}
-	
+
 	public Employee selectById(int id) {
 		Employee employee = entitymanager.find(Employee.class, id);
 		if (employee == null) {
@@ -31,7 +31,7 @@ public class EmployeeDAO implements IEmployeeDAO {
 		}
 		return employee;
 	}
-	
+
 	public List<Employee> selectByName(String firstName, String lastName) {
 		CriteriaBuilder criteriaBuilder = entitymanager.getCriteriaBuilder();
 		CriteriaQuery<Employee> criteriaQuery = criteriaBuilder.createQuery(Employee.class);
@@ -44,23 +44,29 @@ public class EmployeeDAO implements IEmployeeDAO {
 
 		return entitymanager.createQuery(criteriaQuery).getResultList();
 	}
-	
-	public List<Employee> selectAllEmployee() {
+
+	public List<Employee> selectAllEmployees() {
 		CriteriaBuilder criteriaBuilder = entitymanager.getCriteriaBuilder();
 		CriteriaQuery<Employee> criteriaQuery = criteriaBuilder.createQuery(Employee.class);
 
 		Root<Employee> employee = criteriaQuery.from(Employee.class);
 		criteriaQuery.select(employee);
-		
+
 		return entitymanager.createQuery(criteriaQuery).getResultList();
 	}
-		
-	public Employee update(Employee employee, String newFirstName, String newLastName) {
-		employee.setFirstName(newFirstName);
-		employee.setLastName(newLastName);
+
+	public Employee update(Employee employee, Employee newEmployee) {
+		employee.setFirstName(newEmployee.getFirstName());
+		employee.setLastName(newEmployee.getLastName());
+		if (newEmployee.getProjectList() != null) {
+			employee.setProjectList(newEmployee.getProjectList());
+		}
+		if (newEmployee.getWorkingTimeList() != null) {
+			employee.setWorkingTimeList(newEmployee.getWorkingTimeList());
+		}
 		return employee;
 	}
-	
+
 	public void delete(Employee employee) {
 		entitymanager.remove(employee);
 	}

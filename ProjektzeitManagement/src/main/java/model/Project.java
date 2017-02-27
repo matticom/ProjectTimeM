@@ -31,13 +31,13 @@ public class Project {
 	
 	@Column(name = "Project_StartDate")
 //	@Convert(converter = TimestampClassConverter.class)
-	private Instant startDate;
+	private long startDate;
 	
 	@Column(name = "Project_EndDate")
 //	@Convert(converter = TimestampClassConverter.class)
-	private Instant endDate;
+	private long endDate;
 
-	@ManyToMany()
+	@ManyToMany()//cascade = CascadeType.ALL)
 	@JoinTable(
 			name = "PROJECT_EMPLOYEES",
 			joinColumns = @JoinColumn(name="Project_ID", referencedColumnName="Project_ID"),
@@ -45,7 +45,7 @@ public class Project {
 			 )
 	private List<Employee> employeeList;
 	
-	@OneToMany(targetEntity = WorkingTime.class, mappedBy = "project", cascade = CascadeType.ALL)
+	@OneToMany(targetEntity = WorkingTime.class, mappedBy = "project")//, cascade = CascadeType.ALL)
 	private List<WorkingTime> workingTimeList;
 
 	@JoinColumn(name = "Customer_ID_FK")
@@ -58,7 +58,7 @@ public class Project {
 		// TODO Auto-generated constructor stub
 	}
 	
-	public Project(String name, Instant startDate, Instant endDate) {
+	public Project(String name, long startDate, long endDate) {
 		this.name = name;
 		this.startDate = startDate;
 		this.endDate = endDate;
@@ -80,19 +80,19 @@ public class Project {
 		this.name = name;
 	}
 
-	public Instant getStartDate() {
+	public long getStartDate() {
 		return startDate;
 	}
-
-	public void setStartDate(Instant startDate) {
+	
+	public void setStartDate(long startDate) {
 		this.startDate = startDate;
 	}
 
-	public Instant getEndDate() {
+	public long getEndDate() {
 		return endDate;
 	}
-
-	public void setEndDate(Instant endDate) {
+	
+	public void setEndDate(long endDate) {
 		this.endDate = endDate;
 	}
 

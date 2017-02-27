@@ -18,12 +18,12 @@ public class CustomerDAO implements ICustomerDAO {
 	public CustomerDAO(EntityManager entitymanager) {
 		this.entitymanager = entitymanager;
 	}
-	
+
 	public Customer create(Customer customer) {
 		entitymanager.persist(customer);
 		return customer;
 	}
-	
+
 	public Customer selectById(int id) {
 		Customer customer = entitymanager.find(Customer.class, id);
 		if (customer == null) {
@@ -31,7 +31,7 @@ public class CustomerDAO implements ICustomerDAO {
 		}
 		return customer;
 	}
-	
+
 	public Customer selectByName(String name) {
 		CriteriaBuilder criteriaBuilder = entitymanager.getCriteriaBuilder();
 		CriteriaQuery<Customer> criteriaQuery = criteriaBuilder.createQuery(Customer.class);
@@ -42,22 +42,25 @@ public class CustomerDAO implements ICustomerDAO {
 
 		return entitymanager.createQuery(criteriaQuery).getSingleResult();
 	}
-	
-	public List<Customer> selectAllCustomer() {
+
+	public List<Customer> selectAllCustomers() {
 		CriteriaBuilder criteriaBuilder = entitymanager.getCriteriaBuilder();
 		CriteriaQuery<Customer> criteriaQuery = criteriaBuilder.createQuery(Customer.class);
 
 		Root<Customer> customer = criteriaQuery.from(Customer.class);
 		criteriaQuery.select(customer);
-		
+
 		return entitymanager.createQuery(criteriaQuery).getResultList();
 	}
-		
-	public Customer update(Customer customer, String newName) {
-		customer.setName(newName);
+
+	public Customer update(Customer customer, Customer newCustomer) {
+		customer.setName(newCustomer.getName());
+		if (newCustomer.getProjectList() != null) {
+			customer.setProjectList(newCustomer.getProjectList());
+		}
 		return customer;
 	}
-	
+
 	public void delete(Customer customer) {
 		entitymanager.remove(customer);
 	}
