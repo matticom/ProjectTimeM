@@ -65,6 +65,7 @@ public class WorkingTimeDAO implements IWorkingTimeDAO{
 		workingTime.setStartTime(newWorkingTime.getStartTime());
 		workingTime.setEndTime(newWorkingTime.getEndTime());
 		workingTime.setBreakTime(newWorkingTime.getBreakTime());
+		workingTime.setComment(newWorkingTime.getComment());
 		workingTime.setEmployee(newWorkingTime.getEmployee());
 		workingTime.setProject(newWorkingTime.getProject());
 		return workingTime;

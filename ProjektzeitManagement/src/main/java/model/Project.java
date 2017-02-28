@@ -1,6 +1,7 @@
 package model;
 
 import java.time.Instant;
+import java.util.Collections;
 import java.util.List;
 
 import javax.persistence.CascadeType;
@@ -25,39 +26,33 @@ public class Project {
 	@GeneratedValue(strategy = GenerationType.AUTO)
 	@Column(name = "Project_ID")
 	private int id;
-	
+
 	@Column(name = "Project_Name")
 	private String name;
-	
+
 	@Column(name = "Project_StartDate")
-//	@Convert(converter = TimestampClassConverter.class)
+	// @Convert(converter = TimestampClassConverter.class)
 	private long startDate;
-	
+
 	@Column(name = "Project_EndDate")
-//	@Convert(converter = TimestampClassConverter.class)
+	// @Convert(converter = TimestampClassConverter.class)
 	private long endDate;
 
-	@ManyToMany()//cascade = CascadeType.ALL)
-	@JoinTable(
-			name = "PROJECT_EMPLOYEES",
-			joinColumns = @JoinColumn(name="Project_ID", referencedColumnName="Project_ID"),
-			inverseJoinColumns = @JoinColumn(name="Employee_ID", referencedColumnName="Employee_ID")
-			 )
+	@ManyToMany() // cascade = CascadeType.ALL)
+	@JoinTable(name = "PROJECT_EMPLOYEES", joinColumns = @JoinColumn(name = "Project_ID", referencedColumnName = "Project_ID"), inverseJoinColumns = @JoinColumn(name = "Employee_ID", referencedColumnName = "Employee_ID"))
 	private List<Employee> employeeList;
-	
-	@OneToMany(targetEntity = WorkingTime.class, mappedBy = "project")//, cascade = CascadeType.ALL)
+
+	@OneToMany(targetEntity = WorkingTime.class, mappedBy = "project") // , cascade = CascadeType.ALL)
 	private List<WorkingTime> workingTimeList;
 
 	@JoinColumn(name = "Customer_ID_FK")
 	@ManyToOne()
 	private Customer customer;
-	
-	
-	
+
 	public Project() {
 		// TODO Auto-generated constructor stub
 	}
-	
+
 	public Project(String name, long startDate, long endDate) {
 		this.name = name;
 		this.startDate = startDate;
@@ -83,7 +78,7 @@ public class Project {
 	public long getStartDate() {
 		return startDate;
 	}
-	
+
 	public void setStartDate(long startDate) {
 		this.startDate = startDate;
 	}
@@ -91,7 +86,7 @@ public class Project {
 	public long getEndDate() {
 		return endDate;
 	}
-	
+
 	public void setEndDate(long endDate) {
 		this.endDate = endDate;
 	}
@@ -100,16 +95,48 @@ public class Project {
 		return employeeList;
 	}
 
+	public boolean addEmployee(Employee employee) {
+		if (!employee.getProjectList().contains(this)) {
+			employee.addProject(this);
+		}
+		return employeeList.add(employee);
+	}
+
+	public boolean removeEmployee(Employee employee) {
+		boolean done = employeeList.remove(employee);
+		if (done && !employee.getProjectList().contains(this)) {
+			employee.getProjectList().remove(this);
+		}
+		return done;
+	}
+
 	public void setEmployeeList(List<Employee> employeeList) {
 		this.employeeList = employeeList;
 	}
 
 	public List<WorkingTime> getWorkingTimeList() {
-		return workingTimeList;
+		return Collections.unmodifiableList(workingTimeList);
 	}
 
-	public void setWorkingTimeList(List<WorkingTime> workingTimeList) {
-		this.workingTimeList = workingTimeList;
+	public boolean addWorkingTime(WorkingTime workingTime) {
+		workingTime.setProject(this);
+		return workingTimeList.add(workingTime);
+	}
+
+	public boolean removeWorkingTime(WorkingTime workingTime) {
+		boolean done = workingTimeList.remove(workingTime);
+		if (done) {
+			workingTime.setProject(null);
+		}
+		return done;
+	}
+
+	public Customer getCustomer() {
+		return customer;
+	}
+
+	public void setCustomer(Customer customer) {
+		this.customer = customer;
 	}
 
 	@Override

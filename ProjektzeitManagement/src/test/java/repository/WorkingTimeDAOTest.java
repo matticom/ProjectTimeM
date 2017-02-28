@@ -149,6 +149,8 @@ public class WorkingTimeDAOTest {
 		WorkingTime dfbEComGuil = workingTimeDAO.selectById(9);
 		entitymanager.getTransaction().commit();
 		WorkingTime expectedDfbWebTavo = new WorkingTime(1518600000, tavo, dFBWeb);
+		expectedDfbWebTavo.setComment("Kommentar zur Arbeitszeit");
+		
 		workingTimeDAO.update(dfbEComGuil, expectedDfbWebTavo);
 		entitymanager.getTransaction().begin();
 		WorkingTime actualDfbWebTavo = workingTimeDAO.selectById(9);

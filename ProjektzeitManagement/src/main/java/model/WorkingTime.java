@@ -32,6 +32,9 @@ public class WorkingTime {
 	
 	@Column(name = "WorkingTime_BreakTime_Seconds")
 	private int breakTime;
+	
+	@Column(name = "Comments")
+	private String comment;
 
 	@JoinColumn(name = "Employee_ID_FK")
 	@ManyToOne()
@@ -92,11 +95,20 @@ public class WorkingTime {
 		this.breakTime = breakTime;
 	}
 
+	
+	public String getComment() {
+		return comment;
+	}
 
+	
+	public void setComment(String comment) {
+		this.comment = comment;
+	}
+
+	
 	public Employee getEmployee() {
 		return employee;
 	}
-
 
 	public void setEmployee(Employee employee) {
 		this.employee = employee;

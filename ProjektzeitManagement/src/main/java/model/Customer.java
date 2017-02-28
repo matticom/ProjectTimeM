@@ -1,5 +1,7 @@
 package model;
 
+import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 
 import javax.persistence.CascadeType;
@@ -12,16 +14,16 @@ import javax.persistence.OneToMany;
 
 @Entity
 public class Customer {
-	
+
 	@Id
 	@GeneratedValue(strategy = GenerationType.AUTO)
 	@Column(name = "Customer_ID")
 	private int id;
-	
+
 	@Column(name = "Customer_Name")
 	private String name;
-	
-	@OneToMany(targetEntity = Project.class, mappedBy = "customer")//, cascade = CascadeType.ALL)
+
+	@OneToMany(targetEntity = Project.class, mappedBy = "customer") // , cascade = CascadeType.ALL)
 	private List<Project> projectList;
 
 	public Customer() {
@@ -30,6 +32,19 @@ public class Customer {
 
 	public Customer(String name) {
 		this.name = name;
+	}
+
+	private Customer(int id, String name, List<Project> projectList) {
+		this.id = id;
+		this.name = name;
+		this.projectList = projectList;
+	}
+
+	public static Customer createDbTestCustomer(int id, String name, List<Project> projectList) {
+		if (projectList == null) {
+			projectList = new ArrayList<Project>();
+		}
+		return new Customer(id, name, projectList);
 	}
 
 	public int getId() {
@@ -49,11 +64,20 @@ public class Customer {
 	}
 
 	public List<Project> getProjectList() {
-		return projectList;
+		return Collections.unmodifiableList(projectList);
 	}
 
-	public void setProjectList(List<Project> projectList) {
-		this.projectList = projectList;
+	public boolean addProject(Project project) {
+		project.setCustomer(this);
+		return projectList.add(project);
+	}
+
+	public boolean removeProject(Project project) {
+		boolean done = projectList.remove(project);
+		if (done) {
+			project.setCustomer(null);
+		}
+		return done;
 	}
 
 	@Override

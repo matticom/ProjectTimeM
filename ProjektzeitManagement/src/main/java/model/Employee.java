@@ -68,14 +68,38 @@ public class Employee {
 		return workingTimeList;
 	}
 
-	public void setWorkingTimeList(List<WorkingTime> workingTimeList) {
-		this.workingTimeList = workingTimeList;
+	public boolean addWorkingTime(WorkingTime workingTime) {
+		workingTime.setEmployee(this);
+		return workingTimeList.add(workingTime);
+	}
+
+	public boolean removeWorkingTime(WorkingTime workingTime) {
+		boolean done = workingTimeList.remove(workingTime);
+		if (done) {
+			workingTime.setEmployee(null);
+		}
+		return done;
 	}
 
 	public List<Project> getProjectList() {
 		return projectList;
 	}
 
+	public boolean addProject(Project project) {
+		if (!project.getEmployeeList().contains(this)) {
+			project.addEmployee(this);
+		}
+		return projectList.add(project);
+	}
+
+	public boolean removeProject(Project project) {
+		boolean done = projectList.remove(project);
+		if (done && !project.getEmployeeList().contains(this)) {
+			project.getEmployeeList().remove(this);
+		}
+		return done;
+	}
+	
 	public void setProjectList(List<Project> projectList) {
 		this.projectList = projectList;
 	}
