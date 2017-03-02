@@ -55,6 +55,12 @@ public class WorkingTime {
 		this.project = project;
 	}
 
+	public WorkingTime(long startTime, long endTime, int breakTime, String comment) {
+		this.startTime = startTime;
+		this.endTime = endTime;
+		this.breakTime = breakTime;
+		this.comment = comment;
+	}
 
 	public int getId() {
 		return id;

@@ -64,7 +64,7 @@ public class Customer {
 	}
 
 	public List<Project> getProjectList() {
-		return Collections.unmodifiableList(projectList);
+		return projectList;
 	}
 
 	public boolean addProject(Project project) {
@@ -78,6 +78,10 @@ public class Customer {
 			project.setCustomer(null);
 		}
 		return done;
+	}
+	
+	public void setProjectList(List<Project> projectList) {
+		this.projectList = projectList;
 	}
 
 	@Override

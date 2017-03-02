@@ -11,6 +11,7 @@ import javax.persistence.criteria.Root;
 
 import model.Customer;
 import model.Customer_;
+import repository.interfaces.ICustomerDAO;
 
 public class CustomerDAO implements ICustomerDAO {
 	private EntityManager entitymanager;
@@ -32,7 +33,7 @@ public class CustomerDAO implements ICustomerDAO {
 		return customer;
 	}
 
-	public Customer selectByName(String name) {
+	public Customer selectByName(String name) throws NoResultException {
 		CriteriaBuilder criteriaBuilder = entitymanager.getCriteriaBuilder();
 		CriteriaQuery<Customer> criteriaQuery = criteriaBuilder.createQuery(Customer.class);
 
@@ -55,9 +56,6 @@ public class CustomerDAO implements ICustomerDAO {
 
 	public Customer update(Customer customer, Customer newCustomer) {
 		customer.setName(newCustomer.getName());
-		if (newCustomer.getProjectList() != null) {
-			customer.setProjectList(newCustomer.getProjectList());
-		}
 		return customer;
 	}
 

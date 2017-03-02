@@ -141,14 +141,21 @@ public class WorkingTimeDAOTest {
 		entitymanager.getTransaction().commit();
 		assertEquals(1518249600, actualWTList.get(0).getStartTime());
 	}
-
+	
+	@Test
+	public void testPlausibilityCheckForNewTime() {
+		entitymanager.getTransaction().begin();
+		List<WorkingTime> actualWTList = workingTimeDAO.plausibilityCheckForNewTime(1518281100, dFBWeb, tavo); //Zeit zwischen 1518249600 und 1518281100
+		entitymanager.getTransaction().commit();
+		assertEquals(1518249600, actualWTList.get(0).getStartTime());
+	}
 		
 	@Test
 	public void testUpdateWorkingTime() {
 		entitymanager.getTransaction().begin();
 		WorkingTime dfbEComGuil = workingTimeDAO.selectById(9);
 		entitymanager.getTransaction().commit();
-		WorkingTime expectedDfbWebTavo = new WorkingTime(1518600000, tavo, dFBWeb);
+		WorkingTime expectedDfbWebTavo = new WorkingTime(1518600000, tavo, dFBWeb); 
 		expectedDfbWebTavo.setComment("Kommentar zur Arbeitszeit");
 		
 		workingTimeDAO.update(dfbEComGuil, expectedDfbWebTavo);

@@ -11,6 +11,7 @@ import javax.persistence.criteria.Root;
 
 import model.Employee;
 import model.Employee_;
+import repository.interfaces.IEmployeeDAO;
 
 public class EmployeeDAO implements IEmployeeDAO {
 	private EntityManager entitymanager;
@@ -58,12 +59,6 @@ public class EmployeeDAO implements IEmployeeDAO {
 	public Employee update(Employee employee, Employee newEmployee) {
 		employee.setFirstName(newEmployee.getFirstName());
 		employee.setLastName(newEmployee.getLastName());
-		if (newEmployee.getProjectList() != null) {
-			employee.setProjectList(newEmployee.getProjectList());
-		}
-		if (newEmployee.getWorkingTimeList() != null) {
-			employee.setWorkingTimeList(newEmployee.getWorkingTimeList());
-		}
 		return employee;
 	}
 

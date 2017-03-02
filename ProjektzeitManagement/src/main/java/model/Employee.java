@@ -81,6 +81,10 @@ public class Employee {
 		return done;
 	}
 
+	public void setWorkingTimeList(List<WorkingTime> workingTimeList) {
+		this.workingTimeList = workingTimeList;
+	}
+
 	public List<Project> getProjectList() {
 		return projectList;
 	}

@@ -1,41 +1,80 @@
 package businessLogic;
 
-import java.time.Instant;
+import java.util.List;
 
-import javax.persistence.EntityManager;
-import javax.persistence.EntityManagerFactory;
-import javax.persistence.Persistence;
+import javax.persistence.NoResultException;
 
 import businessLogic.ExceptionsBL.CustomerAlreadyExisting;
-
-import static timestampClassConverters.TimeConvertErsatz.*;
-
+import businessLogic.ExceptionsBL.CustomerDoesNotExist;
+import businessLogic.interfaces.ICustomerBL;
 import model.Customer;
-import repository.ICustomerDAO;
+import repository.interfaces.ICustomerDAO;
 
-public class CustomerBL {
+public class CustomerBL implements ICustomerBL {
 
 	private ICustomerDAO customerDAO;
-	private static EntityManagerFactory emfactory;
-	private static EntityManager entitymanager;
-	
+
 	public CustomerBL(ICustomerDAO customerDAO) {
 		this.customerDAO = customerDAO;
-		emfactory = Persistence.createEntityManagerFactory("Eclipselink_JPA_Derby");
-		entitymanager = emfactory.createEntityManager();
 	}
 
 	public Customer createCustomer(String name) throws CustomerAlreadyExisting {
-//		long startDate = instantToLong(begin);
-//		long endDate = instantToLong(end);
-		entitymanager.getTransaction().begin();
 		if (customerDAO.selectByName(name) != null) {
 			throw new CustomerAlreadyExisting(name);
 		}
 		Customer customer = new Customer(name);
-		customer = customerDAO.create(customer);
-		entitymanager.getTransaction().commit();
+		return customerDAO.create(customer);
+	}
+
+	public Customer selectCustomerByName(String name) throws CustomerDoesNotExist {
+		Customer customer;
+		try {
+			customer = customerDAO.selectByName(name);
+		} catch (NoResultException e) {
+
+			throw new CustomerDoesNotExist(name);
+		}
 		return customer;
 	}
 
+	public List<Customer> selectAllCustomer() {
+		List<Customer> customerList = customerDAO.selectAllCustomers();
+		return customerList;
+	}
+
+	public Customer selectCustomerByID(int id) throws CustomerDoesNotExist {
+		Customer customer;
+		try {
+			customer = customerDAO.selectById(id);
+		} catch (NoResultException e) {
+			throw new CustomerDoesNotExist(id);
+		}
+		return customer;
+	}
+
+	public Customer updateCustomer(int id, String newName) throws CustomerDoesNotExist, CustomerAlreadyExisting {
+		Customer customer;
+		try {
+			customer = customerDAO.selectById(id);
+		} catch (NoResultException e) {
+			throw new CustomerDoesNotExist(id);
+		}
+		try {
+			customerDAO.selectByName(newName);
+			throw new CustomerAlreadyExisting(newName);
+		} catch (NoResultException e) {
+			Customer newCustomer = new Customer(newName);
+			return customerDAO.update(customer, newCustomer);
+		}
+	}
+
+	public void deleteCustomer(int id) throws CustomerDoesNotExist {
+		Customer customer;
+		try {
+			customer = customerDAO.selectById(id);
+		} catch (NoResultException e) {
+			throw new CustomerDoesNotExist(id);
+		}
+		customerDAO.delete(customer);
+	}
 }

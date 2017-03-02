@@ -115,7 +115,7 @@ public class Project {
 	}
 
 	public List<WorkingTime> getWorkingTimeList() {
-		return Collections.unmodifiableList(workingTimeList);
+		return workingTimeList;
 	}
 
 	public boolean addWorkingTime(WorkingTime workingTime) {
@@ -129,6 +129,10 @@ public class Project {
 			workingTime.setProject(null);
 		}
 		return done;
+	}
+
+	public void setWorkingTimeList(List<WorkingTime> workingTimeList) {
+		this.workingTimeList = workingTimeList;
 	}
 
 	public Customer getCustomer() {

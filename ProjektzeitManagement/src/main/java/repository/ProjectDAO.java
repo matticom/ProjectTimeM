@@ -11,6 +11,7 @@ import javax.persistence.criteria.Root;
 
 import model.Project;
 import model.Project_;
+import repository.interfaces.IProjectDAO;
 
 public class ProjectDAO implements IProjectDAO{
 	private EntityManager entitymanager;
@@ -57,12 +58,6 @@ public class ProjectDAO implements IProjectDAO{
 		project.setName(newProject.getName());
 		project.setStartDate(newProject.getStartDate());
 		project.setEndDate(newProject.getEndDate());
-		if (newProject.getEmployeeList() != null) {
-			project.setEmployeeList(newProject.getEmployeeList());
-		}
-		if (newProject.getWorkingTimeList() != null) {
-			project.setWorkingTimeList(newProject.getWorkingTimeList());
-		}
 		return project;
 	}
 
