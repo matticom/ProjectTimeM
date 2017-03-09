@@ -1,5 +1,6 @@
 package model;
 
+import java.util.ArrayList;
 import java.util.List;
 
 import javax.persistence.CascadeType;
@@ -38,6 +39,8 @@ public class Employee {
 	public Employee(String firstName, String lastName) {
 		this.firstName = firstName;
 		this.lastName = lastName;
+		workingTimeList = new ArrayList<WorkingTime>();
+		projectList = new ArrayList<Project>();
 	}
 
 	public int getId() {
@@ -69,7 +72,6 @@ public class Employee {
 	}
 
 	public boolean addWorkingTime(WorkingTime workingTime) {
-		workingTime.setEmployee(this);
 		return workingTimeList.add(workingTime);
 	}
 
@@ -90,15 +92,16 @@ public class Employee {
 	}
 
 	public boolean addProject(Project project) {
-		if (!project.getEmployeeList().contains(this)) {
+		boolean done = projectList.add(project);
+		if (done && !project.getEmployeeList().contains(this)) {
 			project.addEmployee(this);
 		}
-		return projectList.add(project);
+		return done;
 	}
 
 	public boolean removeProject(Project project) {
 		boolean done = projectList.remove(project);
-		if (done && !project.getEmployeeList().contains(this)) {
+		if (done && project.getEmployeeList().contains(this)) {
 			project.getEmployeeList().remove(this);
 		}
 		return done;

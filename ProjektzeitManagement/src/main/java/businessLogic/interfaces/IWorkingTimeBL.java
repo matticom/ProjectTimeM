@@ -19,8 +19,10 @@ public interface IWorkingTimeBL {
 			throws WorkingTimeDoesNotExist, EmployeeDoesNotExist, ProjectDoesNotExist;
 
 	public List<WorkingTime> selectAllWorkingTimeByEmployeeAndProject(int employeeID, int projectID) throws EmployeeDoesNotExist, ProjectDoesNotExist;
-
+	public List<WorkingTime> selectAllWorkingTimeByEmployee(int employeeID) throws EmployeeDoesNotExist;
+	public List<WorkingTime> selectAllWorkingTimeByProject(int projectID) throws ProjectDoesNotExist;
 	public WorkingTime selectWorkingTimeByID(int id) throws WorkingTimeDoesNotExist;
+	
 
 	public WorkingTime updateWorkingTime(int id, Instant newStartTime, Instant newEndTime, int newBreakTimeSeconds, String newComment)
 			throws WorkingTimeDoesNotExist, WorkingTimeAlreadyExisting, EndTimeEarlierThanStartTimeException, BreakTimeException;

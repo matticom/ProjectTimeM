@@ -23,7 +23,7 @@ public class Customer {
 	@Column(name = "Customer_Name")
 	private String name;
 
-	@OneToMany(targetEntity = Project.class, mappedBy = "customer") // , cascade = CascadeType.ALL)
+	@OneToMany(targetEntity = Project.class, mappedBy = "customer", cascade = CascadeType.REMOVE)
 	private List<Project> projectList;
 
 	public Customer() {
@@ -32,6 +32,7 @@ public class Customer {
 
 	public Customer(String name) {
 		this.name = name;
+		projectList = new ArrayList<Project>();
 	}
 
 	private Customer(int id, String name, List<Project> projectList) {
@@ -68,8 +69,11 @@ public class Customer {
 	}
 
 	public boolean addProject(Project project) {
-		project.setCustomer(this);
-		return projectList.add(project);
+		boolean done = projectList.add(project);
+		if (done) {
+			project.setCustomer(this);
+		}
+		return done;
 	}
 
 	public boolean removeProject(Project project) {
@@ -79,7 +83,7 @@ public class Customer {
 		}
 		return done;
 	}
-	
+
 	public void setProjectList(List<Project> projectList) {
 		this.projectList = projectList;
 	}

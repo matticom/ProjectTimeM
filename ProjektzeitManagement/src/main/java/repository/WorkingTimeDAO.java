@@ -15,7 +15,7 @@ import model.WorkingTime;
 import model.WorkingTime_;
 import repository.interfaces.IWorkingTimeDAO;
 
-public class WorkingTimeDAO implements IWorkingTimeDAO{
+public class WorkingTimeDAO implements IWorkingTimeDAO {
 	private EntityManager entitymanager;
 
 	public WorkingTimeDAO(EntityManager entitymanager) {
@@ -48,7 +48,7 @@ public class WorkingTimeDAO implements IWorkingTimeDAO{
 
 		return entitymanager.createQuery(criteriaQuery).getResultList();
 	}
-	
+
 	public List<WorkingTime> plausibilityCheckForNewTime(long newTime, Project project, Employee employee) {
 		CriteriaBuilder criteriaBuilder = entitymanager.getCriteriaBuilder();
 		CriteriaQuery<WorkingTime> criteriaQuery = criteriaBuilder.createQuery(WorkingTime.class);
@@ -69,9 +69,16 @@ public class WorkingTimeDAO implements IWorkingTimeDAO{
 		CriteriaQuery<WorkingTime> criteriaQuery = criteriaBuilder.createQuery(WorkingTime.class);
 
 		Root<WorkingTime> workingTime = criteriaQuery.from(WorkingTime.class);
-		Predicate selectEmployee = criteriaBuilder.equal(workingTime.get(WorkingTime_.employee), employee);
-		Predicate selectProject = criteriaBuilder.equal(workingTime.get(WorkingTime_.project), project);
-		Predicate whereFilter = criteriaBuilder.and(selectProject, selectEmployee);
+		Predicate whereFilter;
+		if (employee == null) {
+			whereFilter = criteriaBuilder.equal(workingTime.get(WorkingTime_.project), project);
+		} else if (project == null) {
+			whereFilter = criteriaBuilder.equal(workingTime.get(WorkingTime_.employee), employee);
+		} else {
+			Predicate selectEmployee = criteriaBuilder.equal(workingTime.get(WorkingTime_.employee), employee);
+			Predicate selectProject = criteriaBuilder.equal(workingTime.get(WorkingTime_.project), project);
+			whereFilter = criteriaBuilder.and(selectProject, selectEmployee);
+		}
 		criteriaQuery.select(workingTime).where(whereFilter);
 
 		return entitymanager.createQuery(criteriaQuery).getResultList();

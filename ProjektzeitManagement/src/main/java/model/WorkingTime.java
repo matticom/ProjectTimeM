@@ -1,6 +1,8 @@
 package model;
 
 import java.time.Instant;
+import java.util.ArrayList;
+import java.util.List;
 
 import javax.persistence.Column;
 import javax.persistence.Convert;
@@ -61,7 +63,7 @@ public class WorkingTime {
 		this.breakTime = breakTime;
 		this.comment = comment;
 	}
-
+		
 	public int getId() {
 		return id;
 	}

@@ -1,6 +1,7 @@
 package model;
 
 import java.time.Instant;
+import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 
@@ -53,10 +54,19 @@ public class Project {
 		// TODO Auto-generated constructor stub
 	}
 
-	public Project(String name, long startDate, long endDate) {
+	public Project(String name, long startDate, long endDate, Customer customer) {
 		this.name = name;
 		this.startDate = startDate;
 		this.endDate = endDate;
+		this.customer = customer;
+		employeeList = new ArrayList<Employee>();
+		workingTimeList = new ArrayList<WorkingTime>();
+	}
+	
+	
+
+	public Project(String name, long startDate, long endDate) {
+		this(name, startDate, endDate, null);
 	}
 
 	public int getId() {
@@ -96,15 +106,16 @@ public class Project {
 	}
 
 	public boolean addEmployee(Employee employee) {
-		if (!employee.getProjectList().contains(this)) {
+		boolean done = employeeList.add(employee);
+		if (done && !employee.getProjectList().contains(this)) {
 			employee.addProject(this);
 		}
-		return employeeList.add(employee);
+		return done;
 	}
 
 	public boolean removeEmployee(Employee employee) {
 		boolean done = employeeList.remove(employee);
-		if (done && !employee.getProjectList().contains(this)) {
+		if (done && employee.getProjectList().contains(this)) {
 			employee.getProjectList().remove(this);
 		}
 		return done;
@@ -119,7 +130,6 @@ public class Project {
 	}
 
 	public boolean addWorkingTime(WorkingTime workingTime) {
-		workingTime.setProject(this);
 		return workingTimeList.add(workingTime);
 	}
 

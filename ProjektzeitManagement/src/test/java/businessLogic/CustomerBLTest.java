@@ -8,10 +8,14 @@ import org.mockito.MockitoAnnotations;
 import businessLogic.ExceptionsBL.CustomerAlreadyExisting;
 import businessLogic.ExceptionsBL.CustomerDoesNotExist;
 import model.Customer;
+import model.Project;
 import repository.interfaces.ICustomerDAO;
 
 import static org.junit.Assert.*;
 import static org.mockito.Mockito.*;
+
+import java.util.ArrayList;
+import java.util.List;
 
 import javax.persistence.NoResultException;
 
@@ -101,5 +105,22 @@ public class CustomerBLTest {
 	public void testDeleteCustomerWithNotExistingId() throws CustomerDoesNotExist {
 		when(customerDAOMock.selectById(11)).thenThrow(new NoResultException());
 		customerBL.deleteCustomer(11);
+	}
+	
+	@Test
+	public void testDeleteCustomerWithProjectRemoving() throws CustomerDoesNotExist {
+		Project project1 = new Project("project1", 1486731600, 1518267600, new Customer());
+		Project project2 = new Project("project2", 1486731600, 1518267600, new Customer());
+		List<Project> projectList = new ArrayList<Project>();
+		projectList.add(project1);
+		projectList.add(project2);
+		Customer customer = Customer.createDbTestCustomer(1, "DFB", projectList);
+		project1.setCustomer(customer);
+		project2.setCustomer(customer);
+		when(customerDAOMock.selectById(1)).thenReturn(customer);
+		customerBL.deleteCustomer(1);
+		verify(customerDAOMock).delete(customer);
+		assertEquals(null, project1.getCustomer());
+		assertEquals(null, project2.getCustomer());
 	}
 }

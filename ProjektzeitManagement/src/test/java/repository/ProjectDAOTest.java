@@ -33,6 +33,7 @@ import org.junit.Test;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import model.Customer;
 import model.Project;
 
 import static timestampClassConverters.TimeConvertErsatz.*;
@@ -49,6 +50,7 @@ public class ProjectDAOTest {
 	private static Connection connection;
 
 	private ProjectDAO projectDAO;
+	private CustomerDAO customerDAO;
 	private long startDate;
 	private long endDate;
 
@@ -69,6 +71,7 @@ public class ProjectDAOTest {
 		}
 
 		projectDAO = new ProjectDAO(entitymanager);
+		customerDAO = new CustomerDAO(entitymanager);
 		startDate = instantToLong(LocalDateTime.of(2017, Month.APRIL, 1, 12, 0).toInstant(ZoneOffset.UTC));
 		endDate = instantToLong(LocalDateTime.of(2018, Month.APRIL, 1, 12, 0).toInstant(ZoneOffset.UTC));
 
@@ -90,8 +93,10 @@ public class ProjectDAOTest {
 
 	@Test
 	public void testCreateAndSelectByID() {
-		Project actual = new Project("Projektmanagement", startDate, endDate);
-		
+		entitymanager.getTransaction().begin();
+		Customer dfb = customerDAO.selectById(1);
+		entitymanager.getTransaction().commit();
+		Project actual = new Project("Projektmanagement", startDate, endDate, dfb);
 		entitymanager.getTransaction().begin();
 		int id = projectDAO.create(actual).getId();
 		entitymanager.getTransaction().commit();
@@ -143,7 +148,7 @@ public class ProjectDAOTest {
 		entitymanager.getTransaction().begin();
 		Project dfbWeb = projectDAO.selectById(2);
 		entitymanager.getTransaction().commit();
-		Project expectedProjectTM = new Project("ProjectTM", startDate, endDate);
+		Project expectedProjectTM = new Project("ProjectTM", startDate, endDate, new Customer());
 		projectDAO.update(dfbWeb, expectedProjectTM);
 		entitymanager.getTransaction().begin();
 		Project actualProjectTM = projectDAO.selectById(2);
@@ -153,8 +158,10 @@ public class ProjectDAOTest {
 	
 	@Test(expected = NoResultException.class)
 	public void testCreateAndDeleteProject() {
-		
-		Project monsterProject = new Project("Monster Project", startDate, endDate);
+		entitymanager.getTransaction().begin();
+		Customer dfb = customerDAO.selectById(1);
+		entitymanager.getTransaction().commit();
+		Project monsterProject = new Project("Monster Project", startDate, endDate, dfb);
 		entitymanager.getTransaction().begin();
 		Project monsterProjectWithId = projectDAO.create(monsterProject);
 		entitymanager.getTransaction().commit();

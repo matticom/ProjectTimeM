@@ -8,6 +8,7 @@ import businessLogic.ExceptionsBL.CustomerAlreadyExisting;
 import businessLogic.ExceptionsBL.CustomerDoesNotExist;
 import businessLogic.interfaces.ICustomerBL;
 import model.Customer;
+import model.Project;
 import repository.interfaces.ICustomerDAO;
 
 public class CustomerBL implements ICustomerBL {
@@ -75,6 +76,17 @@ public class CustomerBL implements ICustomerBL {
 		} catch (NoResultException e) {
 			throw new CustomerDoesNotExist(id);
 		}
+		removeAllProjectsFromDeletingCustomer(customer);
 		customerDAO.delete(customer);
+	}
+
+	protected void removeAllProjectsFromDeletingCustomer(Customer customer) {
+		if (customer.getProjectList() == null) {
+			return;
+		}
+		int start = customer.getProjectList().size()-1;
+		for (int i = start; i >= 0; i--) {
+			customer.removeProject(customer.getProjectList().get(i));
+		}
 	}
 }
