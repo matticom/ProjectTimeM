@@ -92,7 +92,10 @@ public class Employee {
 	}
 
 	public boolean addProject(Project project) {
-		boolean done = projectList.add(project);
+		boolean done = false;
+		if (!projectList.contains(project)) {
+			done = projectList.add(project);
+		}
 		if (done && !project.getEmployeeList().contains(this)) {
 			project.addEmployee(this);
 		}

@@ -46,6 +46,7 @@ public class WorkingTimeBL implements IWorkingTimeBL {
 		WorkingTime workingTime = new WorkingTime(startTime, employee, project);
 		employee.addWorkingTime(workingTime);
 		project.addWorkingTime(workingTime);
+		employee.addProject(project);
 		return workingTimeDAO.create(workingTime);
 	}
 

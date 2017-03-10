@@ -20,11 +20,13 @@ public class CustomerBL implements ICustomerBL {
 	}
 
 	public Customer createCustomer(String name) throws CustomerAlreadyExisting {
-		if (customerDAO.selectByName(name) != null) {
+		try {
+			customerDAO.selectByName(name);
 			throw new CustomerAlreadyExisting(name);
+		} catch (NoResultException e) {
+			Customer customer = new Customer(name);
+			return customerDAO.create(customer);
 		}
-		Customer customer = new Customer(name);
-		return customerDAO.create(customer);
 	}
 
 	public Customer selectCustomerByName(String name) throws CustomerDoesNotExist {
@@ -32,7 +34,6 @@ public class CustomerBL implements ICustomerBL {
 		try {
 			customer = customerDAO.selectByName(name);
 		} catch (NoResultException e) {
-
 			throw new CustomerDoesNotExist(name);
 		}
 		return customer;

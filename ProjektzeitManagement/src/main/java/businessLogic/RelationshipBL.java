@@ -25,6 +25,4 @@ public class RelationshipBL {
 	public void deleteProjectRelatedWorkingTimes(int projectId) throws ProjectDoesNotExist, WorkingTimeDoesNotExist {
 		workingTimeRelation.deleteProjectRelatedWorkingTimes(projectId, workingTimeBL);
 	}
-	
-//	public void changeEmployeeWorkingTimeRelation
 }

@@ -5,7 +5,7 @@ import org.junit.runners.Suite.SuiteClasses;
 
 import businessLogic.CustomerBLTest;
 import businessLogic.ProjectBLTest;
-import businessLogic.WorkingTimeRelationTest;
+import businessLogic.RelationshipBLTest;
 import businessLogic.WorkingTimeBLTest;
 import dateTimeClassConverter.TimestampClassConverterTest;
 import repository.CustomerDAOTest;
@@ -15,7 +15,7 @@ import repository.CustomerDAOTest;
 	TimestampClassConverterTest.class,
 	CustomerBLTest.class,
 	WorkingTimeBLTest.class,
-	WorkingTimeRelationTest.class,
+	RelationshipBLTest.class,
 	ProjectBLTest.class
 })
 

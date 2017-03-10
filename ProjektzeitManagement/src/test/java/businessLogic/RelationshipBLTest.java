@@ -23,7 +23,7 @@ import model.Employee;
 import model.Project;
 import model.WorkingTime;
 
-public class WorkingTimeRelationTest {
+public class RelationshipBLTest {
 
 //	private Customer customerDfb;
 //	private Employee employeeTavoSiller;
@@ -57,6 +57,5 @@ public class WorkingTimeRelationTest {
 		workingTimeRelation.deleteProjectRelatedWorkingTimes(projectDfbWebsite.getId(), workingTimeBLMock);
 		verify(workingTimeBLMock, times(3)).deleteWorkingTime(anyInt());
 	}
-	
 	
 }

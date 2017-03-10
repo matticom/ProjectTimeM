@@ -55,6 +55,20 @@ public class WorkingTimeBLTest {
 	public void testCreateWorkingTime() throws WorkingTimeAlreadyExisting, EmployeeDoesNotExist, ProjectDoesNotExist {		
 		when(workingTimeDAOMock.plausibilityCheckForNewTime(1486731600, byMockCreatedProject, byMockCreatedEmployee)).thenReturn(new ArrayList<WorkingTime>());
 		workingTimeBL.createWorkingTime(longToInstant(1486731600l), 4, 2);
+		assertEquals(true, byMockCreatedEmployee.getWorkingTimeList().contains(expectedWorkingTime));
+		assertEquals(true, byMockCreatedProject.getWorkingTimeList().contains(expectedWorkingTime));
+		assertEquals(true, byMockCreatedProject.getEmployeeList().contains(byMockCreatedEmployee));
+		assertEquals(true, byMockCreatedEmployee.getProjectList().contains(byMockCreatedProject));
+		verify(workingTimeDAOMock).create(expectedWorkingTime);
+	}
+	
+	@Test
+	public void testCreateWorkingTimeWithAlreadyRelatedEmployeeAndProject() throws WorkingTimeAlreadyExisting, EmployeeDoesNotExist, ProjectDoesNotExist {		
+		when(workingTimeDAOMock.plausibilityCheckForNewTime(1486731600, byMockCreatedProject, byMockCreatedEmployee)).thenReturn(new ArrayList<WorkingTime>());
+		byMockCreatedEmployee.addProject(byMockCreatedProject);
+		workingTimeBL.createWorkingTime(longToInstant(1486731600l), 4, 2);
+		assertEquals(1, byMockCreatedProject.getEmployeeList().size());
+		assertEquals(1, byMockCreatedEmployee.getProjectList().size());
 		verify(workingTimeDAOMock).create(expectedWorkingTime);
 	}
 	

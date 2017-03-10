@@ -38,11 +38,13 @@ public class ProjectBL implements IProjectBL {
 		} catch (NoResultException e) {
 			throw new CustomerDoesNotExist(customerId);
 		}
-		if (projectDAO.selectByName(name) != null) {
+		try {
+			projectDAO.selectByName(name);
 			throw new ProjectAlreadyExisting(name);
-		}
-		Project project = new Project(name, startDate, endDate, customer);
-		return projectDAO.create(project);
+		} catch (NoResultException e) {
+			Project project = new Project(name, startDate, endDate, customer);
+			return projectDAO.create(project);
+		}		
 	}
 
 	public Project selectProjectByName(String name) throws ProjectDoesNotExist {
