@@ -112,6 +112,14 @@ public class EmployeeDAOTest {
 	}
 	
 	@Test
+	public void testSelectByNameWithoutFoundEntry() {
+		entitymanager.getTransaction().begin();
+		List<Employee> actual = employeeDAO.selectByName("Falscher", "Name");
+		entitymanager.getTransaction().commit();
+		assertEquals(0, actual.size());
+	}
+	
+	@Test
 	public void testUpdateEmployee() {
 		entitymanager.getTransaction().begin();
 		Employee tavo = employeeDAO.selectById(4);

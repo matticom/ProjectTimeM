@@ -24,23 +24,24 @@ public class CustomerBLTest {
 	@Mock protected ICustomerDAO customerDAOMock;
 	protected CustomerBL customerBL;
 	protected Customer expectedCustomer;
+	protected FixtureFactory fixture;
 
 	@Before
 	public void setUp() {
 		MockitoAnnotations.initMocks(this);
-		expectedCustomer = Customer.createDbTestCustomer(1, "DFB", null);
+		fixture = new FixtureFactory();
+		expectedCustomer = fixture.newCustomerWithoutRelationship(1, "DFB");
 		customerBL = new CustomerBL(customerDAOMock);
 	}
 
 	@Test
 	public void testCreateCustomer() throws CustomerAlreadyExisting {
 		Customer newCustomer = new Customer("DFB");
+		when(customerDAOMock.selectByName("DFB")).thenThrow(new NoResultException());
 		when(customerDAOMock.create(newCustomer)).thenReturn(expectedCustomer);
 		Customer dfb = customerBL.createCustomer("DFB");
 		assertEquals(expectedCustomer, dfb);
-		// customerDAOMock wird in DAO injiziert und ruft dann dort create auf als normaler programmablauf, das ist der Aufruf der schon zählt
-		// (braucht vorher nicht extra aufgenommen und abgespielt werden wie bei Easymock
-		verify(customerDAOMock).create(newCustomer); // optional um zu prüfen, dass nur einmal aufgerufen wurde
+		verify(customerDAOMock).create(newCustomer);
 	}
 
 	@Test(expected = CustomerAlreadyExisting.class)
@@ -70,7 +71,7 @@ public class CustomerBLTest {
 	
 	@Test
 	public void testUpdateCustomer() throws CustomerDoesNotExist, CustomerAlreadyExisting {
-		Customer customer = Customer.createDbTestCustomer(1, "HSV", null);
+		Customer customer = fixture.newCustomerWithoutRelationship(1, "HSV");
 		Customer newCustomer = new Customer("DFB");
 		when(customerDAOMock.selectById(1)).thenReturn(customer);
 		when(customerDAOMock.selectByName("DFB")).thenThrow(new NoResultException());
@@ -87,7 +88,7 @@ public class CustomerBLTest {
 	
 	@Test(expected = CustomerAlreadyExisting.class)
 	public void testUpdateCustomerWithAlreadyExistingNewCustomer() throws CustomerDoesNotExist, CustomerAlreadyExisting {
-		Customer customer = Customer.createDbTestCustomer(11, "HSV", null);
+		Customer customer = fixture.newCustomerWithoutRelationship(11, "HSV");
 		when(customerDAOMock.selectById(11)).thenReturn(customer);
 		when(customerDAOMock.selectByName("DFB")).thenReturn(expectedCustomer);
 		customerBL.updateCustomer(11, "DFB");
@@ -95,7 +96,7 @@ public class CustomerBLTest {
 	
 	@Test
 	public void testDeleteCustomer() throws CustomerDoesNotExist {
-		Customer customer = Customer.createDbTestCustomer(1, "DFB", null);
+		Customer customer = fixture.newCustomerWithoutRelationship(1, "DFB");
 		when(customerDAOMock.selectById(1)).thenReturn(customer);
 		customerBL.deleteCustomer(1);
 		verify(customerDAOMock).delete(customer);
@@ -109,14 +110,9 @@ public class CustomerBLTest {
 	
 	@Test
 	public void testDeleteCustomerWithProjectRemoving() throws CustomerDoesNotExist {
-		Project project1 = new Project("project1", 1486731600, 1518267600, new Customer());
-		Project project2 = new Project("project2", 1486731600, 1518267600, new Customer());
-		List<Project> projectList = new ArrayList<Project>();
-		projectList.add(project1);
-		projectList.add(project2);
-		Customer customer = Customer.createDbTestCustomer(1, "DFB", projectList);
-		project1.setCustomer(customer);
-		project2.setCustomer(customer);
+		Project project1 = fixture.newProjectWithRelationship(0);
+		Project project2 = fixture.newProjectWithRelationship(1);
+		Customer customer = fixture.newCustomerWithRelationship();
 		when(customerDAOMock.selectById(1)).thenReturn(customer);
 		customerBL.deleteCustomer(1);
 		verify(customerDAOMock).delete(customer);

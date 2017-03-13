@@ -45,22 +45,11 @@ public class CustomerBL implements ICustomerBL {
 	}
 
 	public Customer selectCustomerByID(int id) throws CustomerDoesNotExist {
-		Customer customer;
-		try {
-			customer = customerDAO.selectById(id);
-		} catch (NoResultException e) {
-			throw new CustomerDoesNotExist(id);
-		}
-		return customer;
+		return CustomerDoesNotExistCheck(id);
 	}
 
 	public Customer updateCustomer(int id, String newName) throws CustomerDoesNotExist, CustomerAlreadyExisting {
-		Customer customer;
-		try {
-			customer = customerDAO.selectById(id);
-		} catch (NoResultException e) {
-			throw new CustomerDoesNotExist(id);
-		}
+		Customer customer = CustomerDoesNotExistCheck(id);
 		try {
 			customerDAO.selectByName(newName);
 			throw new CustomerAlreadyExisting(newName);
@@ -71,12 +60,7 @@ public class CustomerBL implements ICustomerBL {
 	}
 
 	public void deleteCustomer(int id) throws CustomerDoesNotExist {
-		Customer customer;
-		try {
-			customer = customerDAO.selectById(id);
-		} catch (NoResultException e) {
-			throw new CustomerDoesNotExist(id);
-		}
+		Customer customer = CustomerDoesNotExistCheck(id);
 		removeAllProjectsFromDeletingCustomer(customer);
 		customerDAO.delete(customer);
 	}
@@ -88,6 +72,14 @@ public class CustomerBL implements ICustomerBL {
 		int start = customer.getProjectList().size()-1;
 		for (int i = start; i >= 0; i--) {
 			customer.removeProject(customer.getProjectList().get(i));
+		}
+	}
+	
+	private Customer CustomerDoesNotExistCheck(int id) throws CustomerDoesNotExist {
+		try {
+			return customerDAO.selectById(id);
+		} catch (NoResultException e) {
+			throw new CustomerDoesNotExist(id);
 		}
 	}
 }

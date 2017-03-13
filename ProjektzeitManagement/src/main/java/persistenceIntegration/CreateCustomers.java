@@ -31,6 +31,9 @@ public class CreateCustomers extends fit.ColumnFixture {
 	
 	public int getNewCustomerId() {
 		dbConnect.createDbImage();
+		if (customer == null) {
+			return 0;
+		}
 		return customer.getId(); 
 	}
 

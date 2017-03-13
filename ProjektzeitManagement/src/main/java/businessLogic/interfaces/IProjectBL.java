@@ -3,9 +3,11 @@ package businessLogic.interfaces;
 import java.time.Instant;
 import java.util.List;
 
+import businessLogic.WorkingTimeBL;
 import businessLogic.ExceptionsBL.CustomerDoesNotExist;
 import businessLogic.ExceptionsBL.ProjectAlreadyExisting;
 import businessLogic.ExceptionsBL.ProjectDoesNotExist;
+import businessLogic.ExceptionsBL.WorkingTimeDoesNotExist;
 import model.Project;
 
 public interface IProjectBL {
@@ -14,5 +16,5 @@ public interface IProjectBL {
 	public List<Project> selectAllProject();
 	public Project selectProjectByID(int id) throws ProjectDoesNotExist;
 	public Project updateProject(int id, String newName, Instant newBegin, Instant newEnd) throws ProjectDoesNotExist, ProjectAlreadyExisting;
-	public void deleteProject(int id) throws ProjectDoesNotExist;
+	public void deleteProject(int id, IWorkingTimeBL workingTimeBL) throws ProjectDoesNotExist, WorkingTimeDoesNotExist;
 }

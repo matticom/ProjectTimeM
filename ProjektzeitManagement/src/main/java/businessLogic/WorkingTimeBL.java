@@ -124,18 +124,8 @@ public class WorkingTimeBL implements IWorkingTimeBL {
 		WorkingTime workingTime = selectWorkingTimeByID(id);
 		workingTime.getEmployee().removeWorkingTime(workingTime);
 		workingTime.getProject().removeWorkingTime(workingTime);
-//		workingTime.setEmployee(null);
-//		workingTime.setProject(null);
+		workingTime.setEmployee(null);
+		workingTime.setProject(null);
 		workingTimeDAO.delete(workingTime);
 	}
-	
-//	protected void removeAllProjectsFromDeletingCustomer(Customer customer) {
-//		if (customer.getProjectList() == null) {
-//			return;
-//		}
-//		int start = customer.getProjectList().size()-1;
-//		for (int i = start; i >= 0; i--) {
-//			customer.removeProject(customer.getProjectList().get(i));
-//		}
-//	}
 }

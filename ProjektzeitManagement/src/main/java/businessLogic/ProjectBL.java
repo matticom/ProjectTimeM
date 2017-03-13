@@ -9,7 +9,11 @@ import javax.persistence.NoResultException;
 import businessLogic.ExceptionsBL.CustomerDoesNotExist;
 import businessLogic.ExceptionsBL.ProjectAlreadyExisting;
 import businessLogic.ExceptionsBL.ProjectDoesNotExist;
+import businessLogic.ExceptionsBL.WorkingTimeDoesNotExist;
+import businessLogic.RelationshipUnits.WorkingTimeRelation;
 import businessLogic.interfaces.IProjectBL;
+import businessLogic.interfaces.IWorkingTimeBL;
+import businessLogic.interfaces.IWorkingTimeRelation;
 
 import static timestampClassConverters.TimeConvertErsatz.*;
 
@@ -23,10 +27,12 @@ public class ProjectBL implements IProjectBL {
 
 	private IProjectDAO projectDAO;
 	private ICustomerDAO customerDAO;
+	private IWorkingTimeRelation workingTimeRelation;
 
-	public ProjectBL(IProjectDAO projectDAO, ICustomerDAO customerDAO) {
+	public ProjectBL(IProjectDAO projectDAO, ICustomerDAO customerDAO, IWorkingTimeRelation workingTimeRelation) {
 		this.projectDAO = projectDAO;
 		this.customerDAO = customerDAO;
+		this.workingTimeRelation = workingTimeRelation;
 	}
 
 	public Project createProject(String name, Instant begin, Instant end, int customerId) throws ProjectAlreadyExisting, CustomerDoesNotExist {
@@ -63,22 +69,11 @@ public class ProjectBL implements IProjectBL {
 	}
 
 	public Project selectProjectByID(int id) throws ProjectDoesNotExist {
-		Project project;
-		try {
-			project = projectDAO.selectById(id);
-		} catch (NoResultException e) {
-			throw new ProjectDoesNotExist(id);
-		}
-		return project;
+		return selectProjectById(id);
 	}
 
 	public Project updateProject(int id, String newName, Instant newBegin, Instant newEnd) throws ProjectDoesNotExist, ProjectAlreadyExisting {
-		Project project;
-		try {
-			project = projectDAO.selectById(id);
-		} catch (NoResultException e) {
-			throw new ProjectDoesNotExist(id);
-		}
+		Project project = selectProjectById(id);
 		try {
 			projectDAO.selectByName(newName);
 			throw new ProjectAlreadyExisting(newName);
@@ -90,19 +85,30 @@ public class ProjectBL implements IProjectBL {
 		}
 	}
 
-	public void deleteProject(int id) throws ProjectDoesNotExist {
+	public void deleteProject(int id, IWorkingTimeBL workingTimeBL) throws ProjectDoesNotExist, WorkingTimeDoesNotExist {
+		workingTimeRelation.deleteProjectRelatedWorkingTimes(id, workingTimeBL);
+		Project project = selectProjectById(id);
+		removeAllEmployeesFromProject(project);
+		project.getCustomer().getProjectList().remove(project);
+		project.setCustomer(null);
+		projectDAO.delete(project);
+	}
+	
+	private void removeAllEmployeesFromProject(Project project) {
+		List<Employee> employeeList = new ArrayList<Employee>(project.getEmployeeList());
+		for (Employee employee : employeeList) {
+			project.removeEmployee(employee);
+		}
+	}
+	
+	private Project selectProjectById(int id) throws ProjectDoesNotExist {
 		Project project;
 		try {
 			project = projectDAO.selectById(id);
 		} catch (NoResultException e) {
 			throw new ProjectDoesNotExist(id);
 		}
-		List<Employee> employeeList = new ArrayList<Employee>(project.getEmployeeList());
-		for (Employee employee : employeeList) {
-			project.removeEmployee(employee);
-		}
-		project.getCustomer().getProjectList().remove(project);
-		project.setCustomer(null);
-		projectDAO.delete(project);
+		return project;
 	}
+
 }

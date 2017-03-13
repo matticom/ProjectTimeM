@@ -37,6 +37,12 @@ public class FixtureFactory {
 		return customerDfb;
 	}
 	
+	public Customer newCustomerWithoutRelationship(int id, String name) {
+		Customer customer = new Customer(name);
+		customer.setId(id);
+		return customer;
+	}
+	
 	public List<WorkingTime> newWorkTimeListWithRelationship() {
 		return websiteWTList;
 	}
@@ -67,8 +73,8 @@ public class FixtureFactory {
 		customerDfb = new Customer("DFB");
 		employeeTavoSiller = new Employee("Tavo", "Siller");
 		employeeGuillaumeFournier = new Employee("Guillaume", "Fournier");
-		projectDfbWebsite = new Project("DFB Webseite", 1486731600, 1518267600, new Customer());
-		projectDfbEcommerce = new Project("DFB E-Commerce", 1489731600, 1519267600, new Customer());
+		projectDfbWebsite = new Project("DFB Webseite", 1486731600, 1518267600, customerDfb);
+		projectDfbEcommerce = new Project("DFB E-Commerce", 1489731600, 1519267600, customerDfb);
 		workingTime1 = new WorkingTime(1486731600l, employeeTavoSiller, projectDfbWebsite);
 		workingTime2 = new WorkingTime(1586731600l, employeeGuillaumeFournier, projectDfbWebsite);
 		workingTime3 = new WorkingTime(1686731600l, employeeTavoSiller, projectDfbWebsite);

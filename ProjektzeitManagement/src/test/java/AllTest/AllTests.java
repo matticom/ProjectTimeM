@@ -4,6 +4,7 @@ import org.junit.runners.Suite;
 import org.junit.runners.Suite.SuiteClasses;
 
 import businessLogic.CustomerBLTest;
+import businessLogic.EmployeeBLTest;
 import businessLogic.ProjectBLTest;
 import businessLogic.RelationshipBLTest;
 import businessLogic.WorkingTimeBLTest;
@@ -16,7 +17,8 @@ import repository.CustomerDAOTest;
 	CustomerBLTest.class,
 	WorkingTimeBLTest.class,
 	RelationshipBLTest.class,
-	ProjectBLTest.class
+	ProjectBLTest.class,
+	EmployeeBLTest.class
 })
 
 public class AllTests {

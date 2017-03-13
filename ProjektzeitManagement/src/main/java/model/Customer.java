@@ -34,20 +34,7 @@ public class Customer {
 		this.name = name;
 		projectList = new ArrayList<Project>();
 	}
-
-	private Customer(int id, String name, List<Project> projectList) {
-		this.id = id;
-		this.name = name;
-		this.projectList = projectList;
-	}
-
-	public static Customer createDbTestCustomer(int id, String name, List<Project> projectList) {
-		if (projectList == null) {
-			projectList = new ArrayList<Project>();
-		}
-		return new Customer(id, name, projectList);
-	}
-
+	
 	public int getId() {
 		return id;
 	}
