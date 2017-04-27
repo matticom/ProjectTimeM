@@ -69,10 +69,14 @@ public class CustomerBL implements ICustomerBL {
 		if (customer.getProjectList() == null) {
 			return;
 		}
-		int start = customer.getProjectList().size()-1;
-		for (int i = start; i >= 0; i--) {
-			customer.removeProject(customer.getProjectList().get(i));
+		while (customer.getProjectList().size()>0) {
+			customer.removeProject(customer.getProjectList().get(0));
 		}
+		
+//		int start = customer.getProjectList().size()-1;
+//		for (int i = start; i >= 0; i--) {
+//			customer.removeProject(customer.getProjectList().get(i));
+//		}
 	}
 	
 	private Customer CustomerDoesNotExistCheck(int id) throws CustomerDoesNotExist {

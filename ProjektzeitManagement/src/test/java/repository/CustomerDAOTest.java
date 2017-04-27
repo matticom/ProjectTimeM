@@ -3,7 +3,9 @@ package repository;
 import static org.junit.Assert.assertEquals;
 
 import java.io.File;
+import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
+import java.io.IOException;
 import java.sql.Connection;
 import java.sql.SQLException;
 import java.util.List;
@@ -17,6 +19,7 @@ import javax.persistence.Persistence;
 import org.dbunit.database.DatabaseConfig;
 import org.dbunit.database.DatabaseConnection;
 import org.dbunit.database.IDatabaseConnection;
+import org.dbunit.dataset.DataSetException;
 import org.dbunit.dataset.IDataSet;
 import org.dbunit.dataset.xml.FlatXmlDataSet;
 import org.dbunit.dataset.xml.FlatXmlDataSetBuilder;
@@ -46,9 +49,14 @@ public class CustomerDAOTest {
 	@Before
 	public void setUp() {
 
-		emfactory = Persistence.createEntityManagerFactory("Eclipselink_JPA_Derby");
-		entitymanager = emfactory.createEntityManager();
-		connection = ((EntityManagerImpl) (entitymanager.getDelegate())).getServerSession().getAccessor().getConnection();
+		try {
+			emfactory = Persistence.createEntityManagerFactory("Eclipselink_JPA_Derby");
+			entitymanager = emfactory.createEntityManager();
+			connection = ((EntityManagerImpl) (entitymanager.getDelegate())).getServerSession().getAccessor().getConnection();
+		} catch (Exception e) {
+			log.error("Exception bei EntityManager/Connection geworfen: " + e.getMessage());
+			e.printStackTrace();
+		}
 		
 		try {
 			mDBUnitConnection = new DatabaseConnection(connection);
@@ -166,22 +174,13 @@ public class CustomerDAOTest {
 	}
 
 	@After
-	public void tearDown() {
+	public void tearDown() throws SQLException, DataSetException, FileNotFoundException, IOException {
 
-		try {
-			IDataSet fullDataSet = mDBUnitConnection.createDataSet();
-			FlatXmlDataSet.write(fullDataSet, new FileOutputStream("./src/main/resources/DatenbankContent.xml"));
+		IDataSet fullDataSet = mDBUnitConnection.createDataSet();
+		FlatXmlDataSet.write(fullDataSet, new FileOutputStream("./src/main/resources/DatenbankContent.xml"));
 
-		} catch (Exception e) {
-			System.out.println("Es wurde eine Exception beim speichern der Datenbank geworfen: " + e.getMessage());
-			e.printStackTrace();
-		}
-		try {
-			mDBUnitConnection.close();
-		} catch (SQLException e) {
-			System.out.println("Es wurde eine Exception beim Schlieﬂen der IDataConnection geworfen: " + e.getMessage());
-			e.printStackTrace();
-		}
+		mDBUnitConnection.close();
+		
 		entitymanager.close();
 		emfactory.close();
 	}
